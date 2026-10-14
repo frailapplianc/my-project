@@ -1,0 +1,1775 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+<title>Бухгалтерия</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   ДИЗАЙН-ТОКЕНЫ
+   Весь внешний вид меняется здесь: цвета, шрифт, отступы, радиусы, скорость.
+   ========================================================================== */
+:root {
+  /* Цвета: чёрно-белая палитра и один акцент */
+  --color-bg: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #3d3d3d;
+  --color-muted: #7a7a7a;
+  --color-line: #ebebeb;
+  --color-line-strong: #cfcfcf;
+  --color-hover: #f7f7f7;
+  --color-accent: #2f54ff;
+
+  /* Шрифт */
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.875rem;
+  --fs-md: 0.9375rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 2rem;
+  --fs-display: clamp(1.75rem, 4.5vw, 2.75rem);
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  /* Отступы */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 72px;
+
+  /* Радиусы */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-bar: 2px;
+
+  /* Размеры */
+  --container: 1080px;
+  --control-h: 36px;
+  --row-h: 48px;
+  --z-menu: 10;
+
+  /* Анимации: 150–250 мс */
+  --dur-fast: 150ms;
+  --dur: 200ms;
+  --dur-slow: 250ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ---------- Базовое ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  line-height: 1.5;
+}
+h1, h2, p, ul { margin: 0; padding: 0; }
+ul { list-style: none; }
+button, input, select { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; touch-action: manipulation; text-align: inherit; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-left: max(var(--space-3), env(safe-area-inset-left));
+  padding-right: max(var(--space-3), env(safe-area-inset-right));
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+/* ---------- Анимации появления ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.reveal {
+  opacity: 0;
+  animation: rise var(--dur-slow) var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+.swap { animation: fade var(--dur) var(--ease-out); }
+
+/* ---------- Кнопки и поля ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: var(--control-h); padding: 0 var(--space-3);
+  border: 1px solid var(--color-line-strong); border-radius: var(--radius-sm);
+  background: var(--color-bg); color: var(--color-ink);
+  font-size: var(--fs-sm); font-weight: var(--fw-medium);
+  user-select: none; -webkit-user-select: none;
+  transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-bg); }
+.btn-link {
+  font-size: var(--fs-sm); color: var(--color-muted); padding: var(--space-1) 0;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.btn[disabled], .btn-link[disabled] { opacity: 0.4; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { background: var(--color-hover); }
+  .btn-primary:hover { background: var(--color-ink-soft); }
+  .btn-link:hover { color: var(--color-ink); }
+}
+
+.icon-btn {
+  position: relative; display: inline-grid; place-items: center;
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  color: var(--color-muted); font-size: 18px; line-height: 1;
+  transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+}
+.icon-btn::after { content: ""; position: absolute; inset: -8px; }
+@media (hover: hover) and (pointer: fine) {
+  .icon-btn:hover { color: var(--color-ink); background: var(--color-hover); }
+}
+
+.field {
+  height: var(--control-h); min-width: 0; padding: 0;
+  border: 0; border-bottom: 1px solid var(--color-line-strong); border-radius: 0;
+  background: transparent;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.field:focus { border-bottom-color: var(--color-accent); }
+.field::placeholder { color: var(--color-muted); }
+
+.select { position: relative; display: inline-flex; }
+.select select {
+  appearance: none; -webkit-appearance: none;
+  height: var(--control-h); padding: 0 var(--space-4) 0 0;
+  border: 0; border-bottom: 1px solid var(--color-line-strong); border-radius: 0;
+  background: transparent; cursor: pointer;
+}
+.select::after {
+  content: ""; position: absolute; right: 4px; top: 50%;
+  width: 5px; height: 5px; pointer-events: none;
+  border-right: 1.5px solid var(--color-muted); border-bottom: 1.5px solid var(--color-muted);
+  transform: translateY(-70%) rotate(45deg);
+}
+.select-block { display: flex; }
+.select-block select { width: 100%; }
+
+/* ---------- Шапка ---------- */
+.topbar { display: flex; align-items: center; justify-content: space-between; min-height: 72px; gap: var(--space-3); }
+.logo { display: flex; align-items: center; gap: var(--space-3); min-height: 40px; }
+.logo img { display: block; max-height: 40px; max-width: 200px; width: auto; }
+.logo-slot { display: inline-flex; align-items: center; cursor: pointer; font-size: var(--fs-sm); color: var(--color-muted); }
+.logo-slot span { border-bottom: 1px solid var(--color-line-strong); padding-bottom: 1px; }
+
+.switch {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  min-height: var(--control-h); font-size: var(--fs-sm); color: var(--color-ink-soft);
+  user-select: none; -webkit-user-select: none;
+}
+.switch-track {
+  position: relative; width: 28px; height: 16px; border-radius: 999px;
+  background: var(--color-line-strong);
+  transition: background-color var(--dur) var(--ease-out);
+}
+.switch-track::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 12px; height: 12px; border-radius: 50%; background: var(--color-bg);
+  transition: transform var(--dur) var(--ease-out);
+}
+.switch[aria-checked="true"] .switch-track { background: var(--color-ink); }
+.switch[aria-checked="true"] .switch-track::after { transform: translateX(12px); }
+
+/* ---------- Заголовок ---------- */
+.intro { margin-top: var(--space-4); }
+.intro h1 {
+  font-size: var(--fs-xl); font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance;
+}
+.intro p { margin-top: var(--space-2); color: var(--color-muted); text-wrap: pretty; }
+
+/* Редактируемые подписи */
+.is-editable { border-radius: var(--radius-sm); transition: background-color var(--dur-fast) var(--ease-out); }
+.is-editable:focus { outline: 1px solid var(--color-accent); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .is-editable:hover { background: var(--color-hover); }
+}
+
+/* ---------- Вкладки ---------- */
+.tabs-bar {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-3);
+  margin-top: var(--space-5); border-bottom: 1px solid var(--color-line);
+}
+.tabs { display: flex; gap: var(--space-4); overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative; padding: var(--space-2) 0 var(--space-3);
+  color: var(--color-muted); font-weight: var(--fw-medium); white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.tab::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--color-accent); transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur) var(--ease-out);
+}
+.tab[aria-selected="true"] { color: var(--color-ink); }
+.tab[aria-selected="true"]::after { transform: scaleX(1); }
+@media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--color-ink); } }
+.tab-add { padding-bottom: var(--space-3); white-space: nowrap; }
+.tab-stats { margin-left: var(--space-3); }
+.block-first { margin-top: var(--space-5); }
+.tab-tools { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-3); }
+
+/* ---------- Карточки показателей ---------- */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); margin-top: var(--space-5); }
+.card { min-width: 0; border-top: 1px solid var(--color-ink); padding-top: var(--space-3); }
+.card-label { font-size: var(--fs-sm); color: var(--color-muted); }
+.card-value {
+  margin-top: var(--space-2);
+  font-size: var(--fs-display); font-weight: var(--fw-medium);
+  letter-spacing: -0.025em; line-height: 1.1;
+  font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+}
+
+/* ---------- Блоки ---------- */
+.block { margin-top: var(--space-6); }
+.block-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.block-head h2, .analytics h2 { font-size: var(--fs-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em; }
+
+.menu { position: relative; }
+.menu > summary { list-style: none; }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu-list {
+  position: absolute; right: 0; top: calc(100% + var(--space-1)); z-index: var(--z-menu);
+  min-width: 260px; padding: var(--space-1);
+  background: var(--color-bg); border: 1px solid var(--color-line); border-radius: var(--radius-md);
+  animation: fade var(--dur-fast) var(--ease-out);
+}
+.menu-item { display: block; width: 100%; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); font-size: var(--fs-sm); }
+@media (hover: hover) and (pointer: fine) { .menu-item:hover { background: var(--color-hover); } }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); margin: var(--space-3) 0 var(--space-4); }
+.field-search { flex: 1 1 200px; max-width: 320px; }
+.range { display: flex; align-items: flex-end; gap: var(--space-2); font-size: var(--fs-sm); color: var(--color-muted); }
+
+/* ---------- Таблица ---------- */
+.table-wrap { overflow-x: auto; margin: 0 calc(var(--space-3) * -1); -webkit-overflow-scrolling: touch; }
+table { width: 100%; min-width: 680px; border-collapse: collapse; font-size: var(--fs-base); font-variant-numeric: tabular-nums; }
+th {
+  padding: 0 var(--space-3) var(--space-2); text-align: left; white-space: nowrap;
+  font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--color-muted);
+  border-bottom: 1px solid var(--color-line-strong);
+}
+td { height: var(--row-h); padding: 0 var(--space-3); border-bottom: 1px solid var(--color-line); transition: background-color var(--dur-fast) var(--ease-out); }
+.is-right { text-align: right; }
+.th-btn, .th-inner { display: inline-flex; align-items: center; gap: var(--space-1); color: inherit; }
+th.is-right .th-btn, th.is-right .th-inner { flex-direction: row-reverse; }
+.th-btn { transition: color var(--dur-fast) var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .th-btn:hover { color: var(--color-ink); }
+  tbody tr:hover td { background: var(--color-hover); }
+}
+tbody tr:focus-within td { background: var(--color-hover); }
+
+.sort-ind { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid transparent; transition: transform var(--dur-fast) var(--ease-out); }
+.sort-ind[data-dir="asc"] { border-top-color: var(--color-ink); transform: rotate(180deg); }
+.sort-ind[data-dir="desc"] { border-top-color: var(--color-ink); }
+.col-tool, .cell-actions { width: 44px; padding-left: 0; padding-right: var(--space-1); text-align: right; }
+
+.status { display: inline-flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+.dot { flex: none; width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-ink); background: var(--color-ink); }
+.dot[data-tone="hollow"] { background: transparent; }
+.dot[data-tone="faint"] { background: var(--color-line-strong); border-color: var(--color-line-strong); }
+
+/* Редактор: ячейки-поля */
+.is-editor td { padding: 0 var(--space-1); }
+.is-editor td.cell-actions { padding-right: var(--space-1); }
+.cell-input {
+  width: 100%; height: calc(var(--row-h) - var(--space-2)); padding: 0 12px;
+  border: 0; border-radius: var(--radius-sm); background: transparent;
+  text-align: inherit; font-variant-numeric: inherit;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.cell-input:focus-visible { outline: 1px solid var(--color-accent); outline-offset: -1px; background: var(--color-bg); }
+@media (hover: hover) and (pointer: fine) { .cell-input:hover { background: var(--color-line); } }
+select.cell-input { appearance: none; -webkit-appearance: none; cursor: pointer; padding-left: var(--space-2); }
+.status-edit { display: flex; align-items: center; padding-left: 12px; }
+.status-edit .cell-input { flex: 1; }
+
+.empty { padding: var(--space-5) 0 var(--space-3); color: var(--color-muted); }
+.table-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-top: var(--space-3); font-size: var(--fs-sm); color: var(--color-muted); }
+
+/* ---------- Аналитика ---------- */
+.analytics-grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-5); }
+.analytics-grid > div { min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-2) 0 var(--space-3); font-size: var(--fs-sm); color: var(--color-muted); }
+.legend span { display: inline-flex; align-items: center; gap: var(--space-2); }
+.swatch { width: 8px; height: 8px; border-radius: var(--radius-bar); }
+.swatch-income { background: var(--color-ink); }
+.swatch-expense { background: var(--color-line-strong); }
+#chart svg { display: block; overflow: visible; }
+.grid-line { stroke: var(--color-line); stroke-width: 1; }
+.axis { fill: var(--color-muted); font-family: var(--font-ui); font-size: var(--fs-xs); }
+.bar { rx: var(--radius-bar); transition: fill var(--dur-fast) var(--ease-out); }
+.bar-income { fill: var(--color-ink); }
+.bar-expense { fill: var(--color-line-strong); }
+@media (hover: hover) and (pointer: fine) { .bar:hover { fill: var(--color-accent); } }
+
+.breakdown-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.seg { display: inline-flex; gap: var(--space-3); }
+.seg button { font-size: var(--fs-sm); color: var(--color-muted); padding: var(--space-1) 0; border-bottom: 1px solid transparent; transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+.seg button[aria-pressed="true"] { color: var(--color-ink); border-bottom-color: var(--color-ink); }
+#breakdown { margin-top: var(--space-3); display: grid; gap: var(--space-3); }
+.share-row { display: flex; justify-content: space-between; gap: var(--space-3); font-size: var(--fs-base); }
+.share-name { min-width: 0; overflow-wrap: anywhere; }
+.share-sum { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.share-pct { margin-left: var(--space-2); color: var(--color-muted); }
+.share-bar { height: 2px; margin-top: 6px; background: var(--color-line); }
+.share-fill { height: 100%; background: var(--color-ink); }
+
+/* ---------- Диалог ---------- */
+dialog {
+  width: min(420px, calc(100vw - 32px)); padding: 0;
+  border: 1px solid var(--color-line); border-radius: var(--radius-md);
+  background: var(--color-bg); color: var(--color-ink);
+}
+dialog[open] { animation: pop var(--dur) var(--ease-out); }
+dialog::backdrop { background: color-mix(in srgb, var(--color-bg) 70%, transparent); }
+@keyframes pop { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+.dialog-body { padding: var(--space-4); display: grid; gap: var(--space-3); }
+.dialog-body h2 { font-size: var(--fs-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em; }
+.dialog-text { color: var(--color-muted); text-wrap: pretty; }
+.dialog-field { display: grid; gap: var(--space-1); }
+.dialog-field label { font-size: var(--fs-sm); color: var(--color-muted); }
+.dialog-field .field { width: 100%; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+/* ---------- Адаптив ---------- */
+@media (max-width: 800px) {
+  .analytics-grid { grid-template-columns: 1fr; gap: var(--space-5); }
+}
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr; gap: var(--space-4); }
+  .block { margin-top: var(--space-5); }
+  .topbar { min-height: 60px; }
+  .menu-list { min-width: 220px; }
+}
+@media (pointer: coarse) {
+  input, select, .cell-input { font-size: 16px; }
+  .btn, .field, .select select { min-height: 44px; }
+  .tab { padding-top: var(--space-3); }
+}
+
+/* ---------- Уменьшенное движение: остаётся только плавное появление ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation-name: fade; }
+  dialog[open] { animation-name: fade; }
+  .btn:active { transform: none; }
+  .switch-track::after, .tab::after, .sort-ind { transition: none; }
+}
+</style>
+<script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}
+if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+document.documentElement.dataset.theme=t;})();</script>
+</head>
+<body>
+<div class="container">
+
+  <header class="topbar reveal" style="--i:0">
+    <div class="logo" id="logo"></div>
+    <button class="switch" id="editorToggle" type="button" role="switch" aria-checked="false" data-action="toggle-editor">
+      <span>Режим редактора</span>
+      <span class="switch-track" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <section class="intro reveal" style="--i:1">
+    <h1 data-label="title"></h1>
+    <p data-label="subtitle"></p>
+  </section>
+
+  <div class="tabs-bar reveal" style="--i:2">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Категории"></div>
+    <button class="btn-link tab-add" type="button" id="addTab" data-action="add-tab" hidden>Добавить вкладку</button>
+  </div>
+  <div class="tab-tools" id="tabTools" hidden>
+    <button class="btn-link" type="button" data-action="rename-tab">Переименовать</button>
+    <button class="btn-link" type="button" data-action="move-left" id="moveLeft">Сдвинуть влево</button>
+    <button class="btn-link" type="button" data-action="move-right" id="moveRight">Сдвинуть вправо</button>
+    <button class="btn-link" type="button" data-action="delete-tab" id="deleteTab">Удалить вкладку</button>
+  </div>
+
+  <div id="content" role="tabpanel">
+
+  <!-- Вкладка категории: карточки и таблица -->
+  <div id="viewData">
+
+    <section class="cards reveal" style="--i:3" aria-label="Показатели">
+      <div class="card"><p class="card-label" data-label="cardIncome"></p><p class="card-value" id="valIncome"></p></div>
+      <div class="card"><p class="card-label" data-label="cardExpense"></p><p class="card-value" id="valExpense"></p></div>
+      <div class="card"><p class="card-label" data-label="cardBalance"></p><p class="card-value" id="valBalance"></p></div>
+    </section>
+
+    <section class="block reveal" style="--i:4">
+      <div class="block-head">
+        <h2 data-label="tableTitle"></h2>
+        <details class="menu" id="menu">
+          <summary class="btn">Действия</summary>
+          <div class="menu-list" id="menuList"></div>
+        </details>
+      </div>
+
+      <div class="toolbar">
+        <input class="field field-search" id="search" type="search" placeholder="Поиск" aria-label="Поиск по операциям" autocomplete="off">
+        <label class="select"><select id="period" aria-label="Период"></select></label>
+        <div class="range" id="range" hidden>
+          <input class="field" type="date" id="from" aria-label="С даты">
+          <span>до</span>
+          <input class="field" type="date" id="to" aria-label="По дату">
+        </div>
+      </div>
+
+      <div class="table-wrap"><table id="table"></table></div>
+      <p class="empty" id="tableEmpty" hidden></p>
+      <div class="table-foot">
+        <span id="tableCount"></span>
+        <button class="btn" type="button" id="addRow" data-action="add-row" hidden>Добавить строку</button>
+      </div>
+      <datalist id="dl-categories"></datalist>
+    </section>
+
+  </div><!-- /viewData -->
+
+  <!-- Вкладка «Статистика»: итоги, график и разбивка по выбранным данным -->
+  <div id="viewStats" hidden>
+
+    <section class="block block-first reveal" style="--i:3">
+      <div class="block-head"><h2 data-label="statsTitle"></h2></div>
+      <div class="toolbar">
+        <label class="select"><select id="sScope" aria-label="Что учитывать"></select></label>
+        <label class="select"><select id="sPeriod" aria-label="Период"></select></label>
+        <div class="range" id="sRange" hidden>
+          <input class="field" type="date" id="sFrom" aria-label="С даты">
+          <span>до</span>
+          <input class="field" type="date" id="sTo" aria-label="По дату">
+        </div>
+      </div>
+    </section>
+
+    <section class="cards reveal" style="--i:4" aria-label="Показатели статистики">
+      <div class="card"><p class="card-label" data-label="cardIncome"></p><p class="card-value" id="sValIncome"></p></div>
+      <div class="card"><p class="card-label" data-label="cardExpense"></p><p class="card-value" id="sValExpense"></p></div>
+      <div class="card"><p class="card-label" data-label="cardBalance"></p><p class="card-value" id="sValBalance"></p></div>
+    </section>
+
+    <section class="block analytics reveal" style="--i:5">
+      <div class="analytics-grid">
+        <div>
+          <h2 data-label="chartTitle"></h2>
+          <div id="chart"></div>
+        </div>
+        <div>
+          <div class="breakdown-head">
+            <h2 data-label="breakdownTitle"></h2>
+            <div class="seg" role="group" aria-label="Что показывать">
+              <button type="button" data-action="breakdown" data-kind="expense">Расходы</button>
+              <button type="button" data-action="breakdown" data-kind="income">Доходы</button>
+            </div>
+          </div>
+          <ul id="breakdown"></ul>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /viewStats -->
+
+  </div>
+</div>
+
+<dialog id="dialog"></dialog>
+
+<script>
+(() => {
+'use strict';
+
+/* ==========================================================================
+   CONFIG — настройки приложения. Колонки, статусы, подписи, форматы.
+   ========================================================================== */
+const CONFIG = {
+  storageKey: 'ledger-template',
+  locale: 'ru-RU',
+  currency: 'RUB',
+  cardDigits: 0,                 // знаков после запятой в карточках
+  chartMonths: 6,                // сколько месяцев показывать на графике
+  logoMaxWidth: 320,
+  logoMaxHeight: 96,
+  noCategory: 'Без категории',
+  unitForms: ['операция', 'операции', 'операций'],
+
+  // Какие колонки считаются «главными» для расчётов (можно переименовать ключи)
+  fields: { date: 'date', description: 'description', category: 'category', amount: 'amount', status: 'status' },
+
+  // Операции с этими статусами не входят в итоги и аналитику
+  excludedStatuses: ['canceled'],
+
+  // Статусы: tone задаёт вид точки (solid | hollow | faint)
+  statuses: [
+    { value: 'paid',     label: 'Оплачено', tone: 'solid' },
+    { value: 'pending',  label: 'Ожидает',  tone: 'hollow' },
+    { value: 'canceled', label: 'Отменено', tone: 'faint' },
+  ],
+
+  // Подсказки для колонки «Категория»
+  categories: ['Продажи', 'Услуги', 'Аренда', 'Реклама', 'Зарплата', 'Налоги'],
+
+  periods: [
+    { value: 'all',    label: 'Всё время' },
+    { value: 'month',  label: 'Этот месяц' },
+    { value: 'prev',   label: 'Прошлый месяц' },
+    { value: 'd30',    label: 'Последние 30 дней' },
+    { value: 'year',   label: 'Этот год' },
+    { value: 'custom', label: 'Свой период' },
+  ],
+
+  // Типы колонок, которые пользователь может добавить в режиме редактора
+  newColumnTypes: [
+    { value: 'text',   label: 'Текст' },
+    { value: 'number', label: 'Число' },
+    { value: 'date',   label: 'Дата' },
+  ],
+
+  // Подписи на сайте (в режиме редактора правятся прямо на странице)
+  labels: {
+    title: 'Бухгалтерия',
+    subtitle: 'Операции и аналитика',
+    cardIncome: 'Доход',
+    cardExpense: 'Расход',
+    cardBalance: 'Баланс',
+    tableTitle: 'Операции',
+    chartTitle: 'Динамика по месяцам',
+    breakdownTitle: 'По категориям',
+    statsTab: 'Статистика',
+    statsTitle: 'Статистика',
+    allTabs: 'Все вкладки',
+  },
+
+  // Типы данных: как показывать, как вводить, как разбирать значение
+  types: {
+    text:   { align: 'left',  input: 'text',   format: (v) => v ?? '' },
+    date:   { align: 'left',  input: 'date',   format: (v) => fmtDate(v) },
+    number: { align: 'right', input: 'number', format: (v) => fmtNumber(v), parse: parseNum },
+    money:  { align: 'right', input: 'number', step: '0.01', format: (v) => fmtMoney(v, { sign: true }), parse: parseNum },
+    select: { align: 'left',  input: 'select', format: (v, col) => optionLabel(col, v) },
+  },
+
+  // КОЛОНКИ ТАБЛИЦЫ. Новая колонка добавляется одной строкой:
+  //   { key: 'invoice', label: 'Счёт', type: 'text', editable: true },
+  // Поля: key — имя в данных, label — заголовок, type — тип из CONFIG.types,
+  // editable — можно ли править в режиме редактора, core — нельзя удалить,
+  // width — ширина (необязательно), default — значение для новой строки (необязательно).
+  columns: [
+    { key: 'date',        label: 'Дата',      type: 'date',   editable: true, core: true, width: '130px' },
+    { key: 'description', label: 'Описание',  type: 'text',   editable: true, core: true },
+    { key: 'category',    label: 'Категория', type: 'text',   editable: true, core: true, width: '170px', suggest: true },
+    { key: 'amount',      label: 'Сумма',     type: 'money',  editable: true, core: true, width: '150px' },
+    { key: 'status',      label: 'Статус',    type: 'select', editable: true, core: true, width: '160px',
+      options: [
+        { value: 'paid',     label: 'Оплачено', tone: 'solid' },
+        { value: 'pending',  label: 'Ожидает',  tone: 'hollow' },
+        { value: 'canceled', label: 'Отменено', tone: 'faint' },
+      ] },
+  ],
+
+  // Что сохраняется в хранилище (остальное в state живёт только в сессии)
+  persistKeys: ['logo', 'labels', 'columns', 'removedColumns', 'tabs', 'activeTabId', 'view', 'editor'],
+};
+
+const F = CONFIG.fields;
+
+/* ==========================================================================
+   UTILS — небольшие вспомогательные функции без привязки к данным приложения
+   ========================================================================== */
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function uid() { return Math.random().toString(36).slice(2, 9); }
+function pick(obj, keys) { return Object.fromEntries(keys.filter((k) => k in obj).map((k) => [k, obj[k]])); }
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+// Даты хранятся строкой ISO «ГГГГ-ММ-ДД»
+function toISO(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function parseISO(iso) { const [y, m, d] = String(iso).split('-').map(Number); return new Date(y, m - 1, d); }
+function todayISO() { return toISO(new Date()); }
+function isISO(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s)); }
+
+const _fmt = {};
+function fmtDate(iso) {
+  if (!isISO(iso)) return iso || '';
+  _fmt.date ??= new Intl.DateTimeFormat(CONFIG.locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return _fmt.date.format(parseISO(iso));
+}
+function fmtMoney(v, { digits = 2, sign = false } = {}) {
+  const k = `m${digits}${sign}`;
+  _fmt[k] ??= new Intl.NumberFormat(CONFIG.locale, {
+    style: 'currency', currency: CONFIG.currency,
+    minimumFractionDigits: digits, maximumFractionDigits: digits,
+    signDisplay: sign ? 'exceptZero' : 'auto',
+  });
+  return _fmt[k].format(Number(v) || 0);
+}
+function fmtNumber(v) {
+  _fmt.num ??= new Intl.NumberFormat(CONFIG.locale, { maximumFractionDigits: 4 });
+  return v === '' || v == null ? '' : _fmt.num.format(Number(v) || 0);
+}
+function fmtCompact(v) {
+  _fmt.compact ??= new Intl.NumberFormat(CONFIG.locale, { notation: 'compact', maximumFractionDigits: 1 });
+  return _fmt.compact.format(v);
+}
+function parseNum(v) {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+  const n = Number(String(v ?? '').replace('−', '-').replace(',', '.').replace(/[^\d.\-]/g, ''));
+  return Number.isFinite(n) ? n : 0;
+}
+function plural(n, forms) {
+  const rule = new Intl.PluralRules(CONFIG.locale).select(n);
+  return rule === 'one' ? forms[0] : rule === 'few' ? forms[1] : forms[2];
+}
+function monthLabel(key) {
+  const [y, m] = key.split('-').map(Number);
+  _fmt.month ??= new Intl.DateTimeFormat(CONFIG.locale, { month: 'short' });
+  const name = _fmt.month.format(new Date(y, m - 1, 1)).replace('.', '');
+  return y === new Date().getFullYear() ? name : `${name} ${String(y).slice(2)}`;
+}
+function niceMax(v) {
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  const n = v / p;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p;
+}
+function optionLabel(col, value) {
+  return (col.options || []).find((o) => o.value === value)?.label ?? (value ?? '');
+}
+
+// Файлы
+function download(name, text, mime = 'text/plain') {
+  const url = URL.createObjectURL(new Blob([text], { type: `${mime};charset=utf-8` }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: name });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function pickFile(accept) {
+  return new Promise((resolve) => {
+    const input = Object.assign(document.createElement('input'), { type: 'file', accept });
+    input.addEventListener('change', () => resolve(input.files[0] || null), { once: true });
+    input.addEventListener('cancel', () => resolve(null), { once: true });
+    input.click();
+  });
+}
+const readText = (file) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsText(file); });
+const readDataURL = (file) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+const loadImage = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+
+// Логотип уменьшается, чтобы не раздувать localStorage
+async function fileToLogo(file) {
+  const url = await readDataURL(file);
+  if (file.type === 'image/svg+xml') return url;
+  const img = await loadImage(url);
+  const k = Math.min(1, CONFIG.logoMaxWidth / img.naturalWidth, CONFIG.logoMaxHeight / img.naturalHeight);
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(img.naturalWidth * k));
+  canvas.height = Math.max(1, Math.round(img.naturalHeight * k));
+  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/png');
+}
+
+// CSV
+function parseCsv(text) {
+  text = text.replace(/^\uFEFF/, '');
+  const head = text.split(/\r?\n/, 1)[0];
+  const delim = (head.match(/;/g) || []).length >= (head.match(/,/g) || []).length ? ';' : ',';
+  const rows = []; let row = [], cell = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quoted) {
+      if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else quoted = false; }
+      else cell += ch;
+    } else if (ch === '"') quoted = true;
+    else if (ch === delim) { row.push(cell); cell = ''; }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++;
+      row.push(cell); cell = ''; rows.push(row); row = [];
+    } else cell += ch;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter((r) => r.some((c) => c.trim() !== ''));
+}
+function toCsv(rows, delim = ';') {
+  const q = (c) => { c = String(c ?? ''); return /["\n\r]/.test(c) || c.includes(delim) ? `"${c.replace(/"/g, '""')}"` : c; };
+  return rows.map((r) => r.map(q).join(delim)).join('\r\n');
+}
+
+/* ==========================================================================
+   STATE — единый объект состояния. Всё, что видит пользователь, берётся отсюда.
+   Меняйте state через функции из блока ACTIONS, а не руками в разметке.
+   ========================================================================== */
+const state = {
+  // Сохраняется в хранилище (см. CONFIG.persistKeys)
+  logo: null,                 // data-URL логотипа
+  labels: {},                 // свои подписи: { ключ: текст }
+  columns: [],                // колонки таблицы
+  removedColumns: [],         // ключи удалённых колонок из CONFIG.columns
+  tabs: [],                   // [{ id, name, rows: [{ id, date, description, ... }] }]
+  activeTabId: null,
+  view: 'data',               // 'data' — вкладка категории, 'stats' — вкладка «Статистика»
+  editor: false,              // режим редактора
+
+  // Только на время сессии
+  search: '',
+  period: 'all',
+  from: '',
+  to: '',
+  sort: { key: 'date', dir: 'desc' },
+  breakdown: 'expense',       // 'expense' | 'income'
+  statsScope: 'all',          // «Статистика»: 'all' или id вкладки
+  statsPeriod: 'all',         // «Статистика»: свой период, не зависит от таблицы
+  statsFrom: '',
+  statsTo: '',
+};
+
+const activeTab = () => state.tabs.find((t) => t.id === state.activeTabId) || state.tabs[0];
+const L = (key) => state.labels[key] ?? CONFIG.labels[key] ?? key;
+const columnByKey = (key) => state.columns.find((c) => c.key === key);
+
+// Примерные данные для первого запуска (даты считаются от сегодняшнего дня)
+function createSeedData() {
+  const day = (ago) => { const d = new Date(); d.setDate(d.getDate() - ago); return toISO(d); };
+  const r = (ago, description, category, amount, status = 'paid') => ({ id: uid(), date: day(ago), description, category, amount, status });
+  return {
+    tabs: [
+      { id: uid(), name: 'Основной', rows: [
+        r(1,  'Оплата заказа №1042',        'Продажи',  184000),
+        r(3,  'Аренда офиса',               'Аренда',   -65000),
+        r(6,  'Консультация, договор 17',   'Услуги',    42000, 'pending'),
+        r(9,  'Контекстная реклама',        'Реклама',  -28500),
+        r(14, 'Оплата заказа №1038',        'Продажи',  126500),
+        r(20, 'Зарплата, первая часть',     'Зарплата', -90000),
+        r(27, 'Налоговый платёж',           'Налоги',   -21400),
+        r(34, 'Оплата заказа №1031',        'Продажи',  158000),
+        r(41, 'Аренда офиса',               'Аренда',   -65000),
+        r(49, 'Продвижение в соцсетях',     'Реклама',  -19000, 'canceled'),
+        r(58, 'Консультация, договор 12',   'Услуги',    37000),
+        r(66, 'Зарплата',                   'Зарплата', -90000),
+        r(79, 'Оплата заказа №1019',        'Продажи',  141000),
+        r(95, 'Налоговый платёж',           'Налоги',   -18200),
+      ] },
+      { id: uid(), name: 'Проект А', rows: [
+        r(2,  'Предоплата по проекту',      'Услуги',    60000),
+        r(11, 'Материалы',                  'Услуги',   -14200),
+        r(22, 'Этап 1, акт №3',             'Услуги',    75000, 'pending'),
+        r(37, 'Подрядчик',                  'Услуги',   -31000),
+        r(52, 'Предоплата по проекту',      'Услуги',    60000),
+      ] },
+    ],
+  };
+}
+
+/* ==========================================================================
+   STORAGE — слой хранения. Сейчас это localStorage.
+   Чтобы перейти на базу или API, замените тело этих функций, остальной код не меняется
+   (load и save можно сделать async: в init() достаточно добавить await).
+   ========================================================================== */
+const Storage = {
+  load() {
+    try { const raw = localStorage.getItem(CONFIG.storageKey); return raw ? JSON.parse(raw) : null; }
+    catch (e) { console.warn('Storage.load:', e); return null; }
+  },
+  save(s) {
+    try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(pick(s, CONFIG.persistKeys))); return true; }
+    catch (e) { console.warn('Storage.save:', e); emit('storageError', e); return false; }
+  },
+  export(s) { return JSON.stringify(pick(s, CONFIG.persistKeys), null, 2); },
+  import(text) {
+    const data = JSON.parse(text);
+    if (!data || !Array.isArray(data.tabs)) throw new Error('В файле нет вкладок с данными');
+    return data;
+  },
+  reset() { localStorage.removeItem(CONFIG.storageKey); },
+};
+
+// Загружает данные в state; колонки из CONFIG остаются главными по структуре
+function applyData(data) {
+  state.logo = data.logo ?? null;
+  state.labels = { ...(data.labels || {}) };
+  state.removedColumns = data.removedColumns || [];
+  state.columns = mergeColumns(data.columns, state.removedColumns);
+  const tabs = (Array.isArray(data.tabs) && data.tabs.length ? data.tabs : [{ name: 'Основной', rows: [] }]);
+  state.tabs = tabs.map((t) => ({
+    id: t.id || uid(),
+    name: String(t.name || 'Без названия'),
+    rows: (Array.isArray(t.rows) ? t.rows : []).map((r) => ({ ...r, id: r.id || uid() })),
+  }));
+  state.activeTabId = state.tabs.some((t) => t.id === data.activeTabId) ? data.activeTabId : state.tabs[0].id;
+  state.view = data.view === 'stats' ? 'stats' : 'data';
+  state.editor = !!data.editor;
+}
+function mergeColumns(saved = [], removed = []) {
+  const result = saved.map((c) => {
+    const cfg = CONFIG.columns.find((x) => x.key === c.key);
+    return cfg ? { ...cfg, label: c.label ?? cfg.label } : { ...c };
+  });
+  CONFIG.columns.forEach((cfg) => {
+    if (!result.some((c) => c.key === cfg.key) && !removed.includes(cfg.key)) result.push({ ...cfg });
+  });
+  return result;
+}
+
+/* ==========================================================================
+   CALC — чистые функции: принимают данные, возвращают результат.
+   Ничего не читают из DOM и не меняют state.
+   ========================================================================== */
+const isCounted = (row) => !CONFIG.excludedStatuses.includes(row[F.status]);
+
+function formatValue(value, col) {
+  const type = CONFIG.types[col.type] || CONFIG.types.text;
+  return type.format(value, col);
+}
+
+function periodRange(period, from, to, today = new Date()) {
+  const y = today.getFullYear(), m = today.getMonth();
+  switch (period) {
+    case 'month':  return [toISO(new Date(y, m, 1)), toISO(new Date(y, m + 1, 0))];
+    case 'prev':   return [toISO(new Date(y, m - 1, 1)), toISO(new Date(y, m, 0))];
+    case 'd30':    { const s = new Date(today); s.setDate(s.getDate() - 29); return [toISO(s), toISO(today)]; }
+    case 'year':   return [`${y}-01-01`, `${y}-12-31`];
+    case 'custom': return [from || '', to || ''];
+    default:       return ['', ''];
+  }
+}
+function filterByPeriod(rows, period, from, to) {
+  const [a, b] = periodRange(period, from, to);
+  if (!a && !b) return rows;
+  return rows.filter((r) => (!a || r[F.date] >= a) && (!b || r[F.date] <= b));
+}
+function filterBySearch(rows, query, columns) {
+  const q = query.trim().toLowerCase();
+  if (!q) return rows;
+  return rows.filter((r) => columns.some((c) => String(formatValue(r[c.key], c)).toLowerCase().includes(q)));
+}
+function sortRows(rows, sort, columns) {
+  const col = columns.find((c) => c.key === sort.key);
+  if (!col) return rows;
+  const numeric = col.type === 'money' || col.type === 'number';
+  const k = sort.dir === 'asc' ? 1 : -1;
+  const collator = new Intl.Collator(CONFIG.locale, { numeric: true, sensitivity: 'base' });
+  const val = (r) => (col.type === 'select' ? optionLabel(col, r[col.key]) : r[col.key]);
+  return [...rows].sort((a, b) => (numeric
+    ? (parseNum(a[col.key]) - parseNum(b[col.key]))
+    : collator.compare(String(val(a) ?? ''), String(val(b) ?? ''))) * k);
+}
+
+function calcTotals(rows) {
+  let income = 0, expense = 0;
+  rows.filter(isCounted).forEach((r) => {
+    const v = parseNum(r[F.amount]);
+    if (v > 0) income += v; else expense += -v;
+  });
+  return { income, expense, balance: income - expense };
+}
+function calcMonthly(rows, limit = CONFIG.chartMonths) {
+  const map = new Map();
+  rows.filter(isCounted).forEach((r) => {
+    if (!isISO(r[F.date])) return;
+    const key = r[F.date].slice(0, 7);
+    const g = map.get(key) || { key, label: monthLabel(key), income: 0, expense: 0 };
+    const v = parseNum(r[F.amount]);
+    if (v > 0) g.income += v; else g.expense += -v;
+    map.set(key, g);
+  });
+  return [...map.values()].sort((a, b) => a.key.localeCompare(b.key)).slice(-limit);
+}
+function calcByCategory(rows, kind) {
+  const map = new Map();
+  rows.filter(isCounted).forEach((r) => {
+    const v = parseNum(r[F.amount]);
+    if (kind === 'expense' ? v >= 0 : v <= 0) return;
+    const name = String(r[F.category] || '').trim() || CONFIG.noCategory;
+    map.set(name, (map.get(name) || 0) + Math.abs(v));
+  });
+  const total = [...map.values()].reduce((s, v) => s + v, 0);
+  return [...map.entries()]
+    .map(([name, sum]) => ({ name, sum, share: total ? sum / total : 0 }))
+    .sort((a, b) => b.sum - a.sum);
+}
+function knownCategories(tabs) {
+  const set = new Set(CONFIG.categories);
+  tabs.forEach((t) => t.rows.forEach((r) => { const c = String(r[F.category] || '').trim(); if (c) set.add(c); }));
+  return [...set];
+}
+function defaultValue(col) {
+  if (col.default !== undefined) return col.default;
+  switch (col.type) {
+    case 'date': return todayISO();
+    case 'money': case 'number': return 0;
+    case 'select': return col.options?.[0]?.value ?? '';
+    default: return '';
+  }
+}
+
+// Строки, которые сейчас видны на экране
+const rowsInPeriod = (s) => filterByPeriod(activeTab().rows, s.period, s.from, s.to);
+const visibleRows = (s) => sortRows(filterBySearch(rowsInPeriod(s), s.search, s.columns), s.sort, s.columns);
+
+// Строки для вкладки «Статистика»: все вкладки или одна, за выбранный период
+const statsScopeId = (s) => (s.tabs.some((t) => t.id === s.statsScope) ? s.statsScope : 'all');
+const statsRows = (s) => {
+  const scope = statsScopeId(s);
+  const tabs = scope === 'all' ? s.tabs : s.tabs.filter((t) => t.id === scope);
+  return filterByPeriod(tabs.flatMap((t) => t.rows), s.statsPeriod, s.statsFrom, s.statsTo);
+};
+
+/* ==========================================================================
+   EVENTS — шина событий. Подключайте свою логику через on(), не трогая основной код.
+   События (в скобках — что приходит вторым аргументом):
+     stateLoaded      ()                      данные загружены
+     rendered         ()                      интерфейс перерисован
+     editorToggled    { editor }
+     tabChanged       { id, tab }             переход на вкладку категории
+     viewChanged      { view }                'data' или 'stats' (вкладка «Статистика»)
+     tabAdded / tabRenamed / tabDeleted / tabMoved
+     rowAdded         { tabId, row }
+     rowDeleted       { tabId, rowId, row }
+     cellEdited       { tabId, rowId, key, value, oldValue, row }
+     columnAdded / columnDeleted / columnRenamed
+     labelEdited      { key, value }
+     logoChanged      { logo }
+     storageError     (error)
+   Обработчик получает (payload, state).
+   ========================================================================== */
+const _handlers = {};
+function on(event, fn) {
+  (_handlers[event] ??= []).push(fn);
+  return () => { _handlers[event] = _handlers[event].filter((f) => f !== fn); };
+}
+function emit(event, payload) {
+  (_handlers[event] || []).forEach((fn) => {
+    try { fn(payload, state); } catch (e) { console.error(`[хук ${event}]`, e); }
+  });
+}
+
+/* ==========================================================================
+   ACTIONS — все изменения state. Каждое действие вызывает commit:
+   событие → сохранение → перерисовка.
+   ========================================================================== */
+// scope: 'all' — перерисовать всё; 'live' — только карточки и аналитику; 'none' — не перерисовывать
+function commit(events, payload, { scope = 'all', swap = false } = {}) {
+  [].concat(events).forEach((e) => emit(e, payload));
+  Storage.save(state);
+  if (scope === 'all') render(state, { swap });
+  else if (scope === 'live') renderLive(state);
+}
+
+function setEditor(on) {
+  state.editor = on;
+  commit('editorToggled', { editor: on });
+}
+function setActiveTab(id) {
+  if (!state.tabs.some((t) => t.id === id)) return;
+  if (id === state.activeTabId && state.view === 'data') return;
+  const fromStats = state.view !== 'data';
+  state.activeTabId = id;
+  state.view = 'data';
+  commit(fromStats ? ['viewChanged', 'tabChanged'] : 'tabChanged', { id, tab: activeTab(), view: 'data' }, { swap: true });
+}
+function setView(view) {
+  if (state.view === view) return;
+  state.view = view;
+  commit('viewChanged', { view }, { swap: true });
+}
+async function addTab() {
+  const v = await openDialog({ title: 'Новая вкладка', fields: [{ name: 'name', label: 'Название', required: true }], ok: 'Добавить' });
+  const name = v?.name?.trim();
+  if (!name) return;
+  const tab = { id: uid(), name, rows: [] };
+  state.tabs.push(tab);
+  state.activeTabId = tab.id;
+  state.view = 'data';
+  commit(['tabAdded', 'tabChanged'], { id: tab.id, tab }, { swap: true });
+}
+async function renameTab() {
+  const tab = activeTab();
+  const v = await openDialog({ title: 'Название вкладки', fields: [{ name: 'name', label: 'Название', value: tab.name, required: true }] });
+  const name = v?.name?.trim();
+  if (!name || name === tab.name) return;
+  const old = tab.name;
+  tab.name = name;
+  commit('tabRenamed', { id: tab.id, name, oldName: old });
+}
+async function deleteTab() {
+  if (state.tabs.length < 2) return;
+  const tab = activeTab();
+  const v = await openDialog({ title: `Удалить вкладку «${tab.name}»?`, text: 'Все операции этой вкладки будут удалены без возможности восстановления.', ok: 'Удалить' });
+  if (!v) return;
+  const i = state.tabs.indexOf(tab);
+  state.tabs.splice(i, 1);
+  state.activeTabId = state.tabs[Math.max(0, i - 1)].id;
+  if (state.statsScope === tab.id) state.statsScope = 'all';
+  commit(['tabDeleted', 'tabChanged'], { id: tab.id, tab, activeId: state.activeTabId }, { swap: true });
+}
+function moveTab(dir) {
+  const i = state.tabs.findIndex((t) => t.id === state.activeTabId);
+  const j = i + dir;
+  if (j < 0 || j >= state.tabs.length) return;
+  [state.tabs[i], state.tabs[j]] = [state.tabs[j], state.tabs[i]];
+  commit('tabMoved', { id: state.activeTabId, from: i, to: j });
+}
+
+function addRow() {
+  const tab = activeTab();
+  const row = { id: uid() };
+  state.columns.forEach((c) => { row[c.key] = defaultValue(c); });
+  // Сбрасываем фильтры, чтобы новая строка не пропала из вида
+  state.search = '';
+  state.period = 'all';
+  tab.rows.push(row);
+  commit('rowAdded', { tabId: tab.id, row });
+  const target = $(`tr[data-row="${row.id}"] [data-col="${F.description}"]`) || $(`tr[data-row="${row.id}"] .cell-input`);
+  target?.focus();
+}
+function deleteRow(rowId) {
+  const tab = activeTab();
+  const row = tab.rows.find((r) => r.id === rowId);
+  if (!row) return;
+  tab.rows = tab.rows.filter((r) => r.id !== rowId);
+  commit('rowDeleted', { tabId: tab.id, rowId, row });
+}
+function editCell(rowId, key, raw) {
+  const tab = activeTab();
+  const row = tab.rows.find((r) => r.id === rowId);
+  const col = columnByKey(key);
+  if (!row || !col) return;
+  const type = CONFIG.types[col.type] || CONFIG.types.text;
+  const value = type.parse ? type.parse(raw) : String(raw);
+  const oldValue = row[key];
+  if (value === oldValue) return;
+  row[key] = value;
+  commit('cellEdited', { tabId: tab.id, rowId, key, value, oldValue, row }, { scope: 'live' });
+}
+
+async function addColumn() {
+  const v = await openDialog({
+    title: 'Новая колонка',
+    fields: [
+      { name: 'name', label: 'Название', required: true },
+      { name: 'type', label: 'Тип данных', type: 'select', options: CONFIG.newColumnTypes, value: 'text' },
+    ],
+    ok: 'Добавить',
+  });
+  const name = v?.name?.trim();
+  if (!name) return;
+  const column = { key: `c_${uid()}`, label: name, type: v.type || 'text', editable: true, core: false };
+  state.columns.push(column);
+  commit('columnAdded', { column });
+}
+async function deleteColumn(key) {
+  const col = columnByKey(key);
+  if (!col || col.core) return;
+  const v = await openDialog({ title: `Удалить колонку «${col.label}»?`, text: 'Значения этой колонки во всех вкладках будут удалены.', ok: 'Удалить' });
+  if (!v) return;
+  state.columns = state.columns.filter((c) => c.key !== key);
+  state.tabs.forEach((t) => t.rows.forEach((r) => { delete r[key]; }));
+  if (CONFIG.columns.some((c) => c.key === key)) state.removedColumns.push(key);
+  if (state.sort.key === key) state.sort = { key: F.date, dir: 'desc' };
+  commit('columnDeleted', { key, column: col });
+}
+function editColumnLabel(key, text, el) {
+  const col = columnByKey(key);
+  if (!col) return;
+  text = text.replace(/\s+/g, ' ').trim() || col.label;
+  el.textContent = text;
+  if (text === col.label) return;
+  col.label = text;
+  commit('columnRenamed', { key, label: text }, { scope: 'none' });
+}
+function editLabel(key, text, el) {
+  text = text.replace(/\s+/g, ' ').trim();
+  if (!text) { delete state.labels[key]; text = L(key); el.textContent = text; }
+  else if (text === L(key)) { el.textContent = text; return; }
+  else { state.labels[key] = text; el.textContent = text; }
+  if (key === 'title') document.title = text;
+  commit('labelEdited', { key, value: text }, { scope: 'none' });
+}
+async function setLogoFromFile(file) {
+  if (!file) return;
+  try {
+    state.logo = await fileToLogo(file);
+    commit('logoChanged', { logo: state.logo });
+  } catch (e) { showMessage('Не удалось загрузить логотип', 'Выберите файл изображения: PNG, JPG или SVG.'); }
+}
+function removeLogo() { state.logo = null; commit('logoChanged', { logo: null }); }
+
+function setSort(key) {
+  state.sort = state.sort.key === key
+    ? { key, dir: state.sort.dir === 'asc' ? 'desc' : 'asc' }
+    : { key, dir: 'asc' };
+  renderTable(state);
+}
+
+// Диалог: поля → Promise с объектом значений (или null при отмене)
+function openDialog({ title, text = '', fields = [], ok = 'Сохранить', cancel = true }) {
+  const dlg = $('#dialog');
+  return new Promise((resolve) => {
+    const fieldsHtml = fields.map((f) => {
+      const id = `dlg-${f.name}`;
+      const control = f.type === 'select'
+        ? `<label class="select select-block"><select class="field" id="${id}" name="${f.name}">${f.options.map((o) => `<option value="${esc(o.value)}"${o.value === f.value ? ' selected' : ''}>${esc(o.label)}</option>`).join('')}</select></label>`
+        : `<input class="field" id="${id}" name="${f.name}" type="text" value="${esc(f.value ?? '')}" maxlength="80" autocomplete="off"${f.required ? ' required' : ''}>`;
+      return `<div class="dialog-field"><label for="${id}">${esc(f.label)}</label>${control}</div>`;
+    }).join('');
+    dlg.innerHTML = `<form method="dialog" class="dialog-body">
+      <h2>${esc(title)}</h2>
+      ${text ? `<p class="dialog-text">${esc(text)}</p>` : ''}
+      ${fieldsHtml}
+      <div class="dialog-actions">
+        ${cancel ? '<button type="button" class="btn" data-dialog-cancel>Отмена</button>' : ''}
+        <button type="submit" class="btn btn-primary" value="ok">${esc(ok)}</button>
+      </div>
+    </form>`;
+    const form = $('form', dlg);
+    dlg.returnValue = '';
+    $('[data-dialog-cancel]', dlg)?.addEventListener('click', () => dlg.close('cancel'));
+    dlg.addEventListener('close', () => {
+      resolve(dlg.returnValue === 'ok' ? Object.fromEntries(new FormData(form)) : null);
+    }, { once: true });
+    dlg.showModal();
+    ($('input, select', dlg) || $('[data-dialog-cancel]', dlg) || $('[type="submit"]', dlg)).focus();
+  });
+}
+const showMessage = (title, text) => openDialog({ title, text, ok: 'Закрыть', cancel: false });
+
+/* ==========================================================================
+   RENDER — отрисовка. render(state) собирает интерфейс из state.
+   ========================================================================== */
+function render(s, { swap = false } = {}) {
+  renderChrome(s);
+  renderTabs(s);
+  renderToolbar(s);
+  renderCards(s);
+  renderTable(s);
+  renderAnalytics(s);
+  if (swap) replaySwap();
+  emit('rendered');
+}
+// Лёгкая перерисовка после правки ячейки: таблица остаётся на месте, фокус не теряется
+function renderLive(s) { renderCards(s); renderAnalytics(s); }
+
+function replaySwap() {
+  const c = $('#content');
+  c.classList.remove('swap');
+  void c.offsetWidth;
+  c.classList.add('swap');
+}
+function setEditable(el, on) {
+  if (on) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); el.classList.add('is-editable'); }
+  else { el.removeAttribute('contenteditable'); el.classList.remove('is-editable'); }
+}
+
+function renderChrome(s) {
+  document.body.classList.toggle('is-editor', s.editor);
+  $('#editorToggle').setAttribute('aria-checked', String(s.editor));
+  $$('[data-label]').forEach((el) => {
+    if (el !== document.activeElement) el.textContent = L(el.dataset.label);
+    setEditable(el, s.editor);
+  });
+  document.title = L('title');
+  const logo = $('#logo');
+  const img = s.logo ? `<img src="${esc(s.logo)}" alt="Логотип">` : '';
+  logo.innerHTML = s.editor
+    ? `<label class="logo-slot">${img || '<span>Загрузить логотип</span>'}<input class="sr-only" id="logoInput" type="file" accept="image/*"></label>${s.logo ? '<button class="btn-link" type="button" data-action="remove-logo">Убрать</button>' : ''}`
+    : img;
+}
+
+function renderTabs(s) {
+  const inData = s.view === 'data';
+  const cats = s.tabs.map((t) => {
+    const active = inData && t.id === s.activeTabId;
+    return `<button class="tab" type="button" role="tab" id="tab-${esc(t.id)}" data-action="tab" data-id="${esc(t.id)}" aria-selected="${active}" tabindex="${active ? 0 : -1}">${esc(t.name)}</button>`;
+  }).join('');
+  const stats = `<button class="tab tab-stats" type="button" role="tab" id="tab-stats" data-action="stats-tab" aria-selected="${!inData}" tabindex="${inData ? -1 : 0}">${esc(L('statsTab'))}</button>`;
+  $('#tabs').innerHTML = cats + stats;
+  $('#content').setAttribute('aria-labelledby', inData ? `tab-${s.activeTabId}` : 'tab-stats');
+  $('#viewData').hidden = !inData;
+  $('#viewStats').hidden = inData;
+  $('#addTab').hidden = !s.editor;
+  $('#tabTools').hidden = !(s.editor && inData);
+  const i = s.tabs.findIndex((t) => t.id === s.activeTabId);
+  $('#moveLeft').disabled = i <= 0;
+  $('#moveRight').disabled = i >= s.tabs.length - 1;
+  $('#deleteTab').disabled = s.tabs.length < 2;
+}
+
+function renderToolbar(s) {
+  const periodOptions = CONFIG.periods.map((p) => `<option value="${p.value}">${esc(p.label)}</option>`).join('');
+  const period = $('#period');
+  if (!period.options.length) period.innerHTML = periodOptions;
+  period.value = s.period;
+
+  // Вкладка «Статистика»: что учитывать и за какой период
+  $('#sScope').innerHTML = `<option value="all">${esc(L('allTabs'))}</option>` + s.tabs.map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('');
+  $('#sScope').value = statsScopeId(s);
+  const sPeriod = $('#sPeriod');
+  if (!sPeriod.options.length) sPeriod.innerHTML = periodOptions;
+  sPeriod.value = s.statsPeriod;
+  $('#sRange').hidden = s.statsPeriod !== 'custom';
+  $('#sFrom').value = s.statsFrom;
+  $('#sTo').value = s.statsTo;
+
+  $('#range').hidden = s.period !== 'custom';
+  $('#from').value = s.from;
+  $('#to').value = s.to;
+  const search = $('#search');
+  if (search !== document.activeElement) search.value = s.search;
+  $('#menuList').innerHTML = MY_ACTIONS
+    .filter((a) => !a.editorOnly || s.editor)
+    .map((a) => `<button class="menu-item" type="button" data-action="custom" data-id="${a.id}">${esc(a.label)}</button>`).join('');
+}
+
+function renderCards(s) {
+  const opts = { digits: CONFIG.cardDigits };
+  const fill = (prefix, t) => {
+    $(`#${prefix}Income`).textContent = fmtMoney(t.income, opts);
+    $(`#${prefix}Expense`).textContent = fmtMoney(t.expense, opts);
+    $(`#${prefix}Balance`).textContent = fmtMoney(t.balance, opts);
+  };
+  fill('val', calcTotals(rowsInPeriod(s)));     // вкладка категории
+  fill('sVal', calcTotals(statsRows(s)));       // вкладка «Статистика»
+}
+
+// Ячейка в режиме просмотра
+function viewHtml(value, col) {
+  if (col.type === 'select') {
+    const label = optionLabel(col, value);
+    const tone = (col.options || []).find((o) => o.value === value)?.tone;
+    return tone ? `<span class="status"><span class="dot" data-tone="${tone}"></span>${esc(label)}</span>` : esc(label);
+  }
+  return esc(formatValue(value, col));
+}
+// Ячейка в режиме редактора
+function inputHtml(row, col) {
+  const type = CONFIG.types[col.type] || CONFIG.types.text;
+  const value = row[col.key];
+  const attrs = `class="cell-input" data-col="${esc(col.key)}" aria-label="${esc(col.label)}"`;
+  if (type.input === 'select') {
+    const tone = (col.options || []).find((o) => o.value === value)?.tone || 'solid';
+    const options = (col.options || []).map((o) => `<option value="${esc(o.value)}"${o.value === value ? ' selected' : ''}>${esc(o.label)}</option>`).join('');
+    return `<span class="status-edit"><span class="dot" data-tone="${tone}"></span><select ${attrs}>${options}</select></span>`;
+  }
+  const extra = `${type.step ? ` step="${type.step}"` : ''}${col.suggest ? ' list="dl-categories"' : ''}`;
+  return `<input ${attrs} type="${type.input}" value="${esc(value ?? '')}"${extra}>`;
+}
+
+function renderTable(s) {
+  const tab = activeTab();
+  const visible = visibleRows(s);
+  const editor = s.editor;
+
+  const head = s.columns.map((col) => {
+    const sorted = s.sort.key === col.key;
+    const dir = sorted ? s.sort.dir : '';
+    const ind = `<span class="sort-ind" data-dir="${dir}" aria-hidden="true"></span>`;
+    const right = (CONFIG.types[col.type] || {}).align === 'right' ? ' is-right' : '';
+    const width = col.width ? ` style="width:${esc(col.width)}"` : '';
+    const key = esc(col.key);
+    const inner = editor
+      ? `<span class="th-inner"><span class="th-label is-editable" contenteditable="true" spellcheck="false" data-col-label="${key}">${esc(col.label)}</span><button class="icon-btn" type="button" data-action="sort" data-col="${key}" aria-label="Сортировать: ${esc(col.label)}">${ind}</button>${col.core ? '' : `<button class="icon-btn" type="button" data-action="delete-column" data-col="${key}" aria-label="Удалить колонку ${esc(col.label)}">×</button>`}</span>`
+      : `<button class="th-btn" type="button" data-action="sort" data-col="${key}"><span>${esc(col.label)}</span>${ind}</button>`;
+    const aria = sorted ? (dir === 'asc' ? 'ascending' : 'descending') : 'none';
+    return `<th scope="col" class="${right.trim()}"${width} aria-sort="${aria}">${inner}</th>`;
+  }).join('');
+  const toolHead = editor ? '<th scope="col" class="col-tool"><button class="icon-btn" type="button" data-action="add-column" aria-label="Добавить колонку">+</button></th>' : '';
+
+  const body = visible.map((row) => {
+    const cells = s.columns.map((col) => {
+      const right = (CONFIG.types[col.type] || {}).align === 'right' ? ' class="is-right"' : '';
+      return `<td${right}>${editor && col.editable ? inputHtml(row, col) : viewHtml(row[col.key], col)}</td>`;
+    }).join('');
+    const del = editor ? `<td class="cell-actions"><button class="icon-btn" type="button" data-action="delete-row" aria-label="Удалить строку">×</button></td>` : '';
+    return `<tr data-row="${esc(row.id)}">${cells}${del}</tr>`;
+  }).join('');
+
+  $('#table').innerHTML = `<caption class="sr-only">${esc(tab.name)}</caption><thead><tr>${head}${toolHead}</tr></thead><tbody>${body}</tbody>`;
+  $('#table').classList.toggle('is-editor', editor);
+
+  $('#dl-categories').innerHTML = knownCategories(s.tabs).map((c) => `<option value="${esc(c)}"></option>`).join('');
+
+  const empty = $('#tableEmpty');
+  empty.hidden = visible.length > 0;
+  if (!visible.length) {
+    empty.textContent = tab.rows.length
+      ? 'Ничего не найдено. Измените поиск или период.'
+      : (editor ? 'Операций пока нет. Добавьте первую.' : 'Операций пока нет.');
+  }
+  const total = tab.rows.length;
+  $('#tableCount').textContent = visible.length === total
+    ? `${total} ${plural(total, CONFIG.unitForms)}`
+    : `${visible.length} из ${total}`;
+  $('#addRow').hidden = !editor;
+}
+
+function renderAnalytics(s) {
+  const rows = statsRows(s);
+  renderChart(rows);
+  renderBreakdown(rows, s);
+}
+
+// Столбчатый график на чистом SVG: доход и расход по месяцам
+function buildChartSvg(groups, width) {
+  const W = Math.max(280, width), H = 220, PL = 48, PR = 4, PT = 12, PB = 28;
+  const max = niceMax(Math.max(1, ...groups.flatMap((g) => [g.income, g.expense])));
+  const iw = W - PL - PR, ih = H - PT - PB;
+  const gw = iw / groups.length, bw = Math.min(22, gw * 0.28), gap = 4;
+  const y = (v) => PT + ih - (v / max) * ih;
+  const h = (v) => (v > 0 ? Math.max(1, (v / max) * ih) : 0);
+
+  const grid = [0, 0.5, 1].map((f) => {
+    const yy = y(max * f);
+    return `<line class="grid-line" x1="${PL}" x2="${W - PR}" y1="${yy}" y2="${yy}"/><text class="axis" x="${PL - 8}" y="${yy + 4}" text-anchor="end">${esc(fmtCompact(max * f))}</text>`;
+  }).join('');
+
+  const bars = groups.map((g, i) => {
+    const cx = PL + gw * i + gw / 2;
+    const tip = (name, v) => `<title>${esc(g.label)}: ${esc(name)} ${esc(fmtMoney(v, { digits: 0 }))}</title>`;
+    return `<g>
+      <rect class="bar bar-income" x="${cx - bw - gap / 2}" y="${y(g.income)}" width="${bw}" height="${h(g.income)}">${tip(L('cardIncome'), g.income)}</rect>
+      <rect class="bar bar-expense" x="${cx + gap / 2}" y="${y(g.expense)}" width="${bw}" height="${h(g.expense)}">${tip(L('cardExpense'), g.expense)}</rect>
+      <text class="axis" x="${cx}" y="${H - 8}" text-anchor="middle">${esc(g.label)}</text>
+    </g>`;
+  }).join('');
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(L('chartTitle'))}">${grid}${bars}</svg>`;
+}
+function renderChart(rows) {
+  const mount = $('#chart');
+  const groups = calcMonthly(rows);
+  if (!groups.length) { mount.innerHTML = '<p class="empty">Нет данных за выбранный период.</p>'; return; }
+  const legend = `<div class="legend"><span><i class="swatch swatch-income"></i>${esc(L('cardIncome'))}</span><span><i class="swatch swatch-expense"></i>${esc(L('cardExpense'))}</span></div>`;
+  mount.innerHTML = legend + buildChartSvg(groups, mount.clientWidth || 640);
+}
+function renderBreakdown(rows, s) {
+  $$('[data-action="breakdown"]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kind === s.breakdown)));
+  const items = calcByCategory(rows, s.breakdown);
+  $('#breakdown').innerHTML = items.length
+    ? items.map((it) => `<li><div class="share-row"><span class="share-name">${esc(it.name)}</span><span class="share-sum">${esc(fmtMoney(it.sum, { digits: 0 }))}<span class="share-pct">${Math.round(it.share * 100)}%</span></span></div><div class="share-bar"><div class="share-fill" style="width:${(it.share * 100).toFixed(1)}%"></div></div></li>`).join('')
+    : '<li class="empty">Нет данных за выбранный период.</li>';
+}
+
+/* ==========================================================================
+   EVENTS (DOM) — обработчики интерфейса. Здесь только связка «клик → действие».
+   ========================================================================== */
+function bindEvents() {
+  document.addEventListener('click', onClick);
+  document.addEventListener('change', onChange);
+  document.addEventListener('input', onInput);
+  document.addEventListener('focusout', onFocusOut);
+  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('paste', onPaste);
+  window.addEventListener('resize', debounce(() => renderChart(statsRows(state)), 150));
+}
+
+function onClick(e) {
+  const menu = $('#menu');
+  if (menu.open && !e.target.closest('#menu')) menu.open = false;
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const d = el.dataset;
+  switch (d.action) {
+    case 'toggle-editor': setEditor(!state.editor); break;
+    case 'tab':           setActiveTab(d.id); break;
+    case 'stats-tab':     setView('stats'); break;
+    case 'add-tab':       addTab(); break;
+    case 'rename-tab':    renameTab(); break;
+    case 'delete-tab':    deleteTab(); break;
+    case 'move-left':     moveTab(-1); break;
+    case 'move-right':    moveTab(1); break;
+    case 'add-row':       addRow(); break;
+    case 'delete-row':    deleteRow(el.closest('tr').dataset.row); break;
+    case 'add-column':    addColumn(); break;
+    case 'delete-column': deleteColumn(d.col); break;
+    case 'sort':          setSort(d.col); break;
+    case 'remove-logo':   removeLogo(); break;
+    case 'breakdown':     state.breakdown = d.kind; renderAnalytics(state); break;
+    case 'custom':        menu.open = false; runCustomAction(d.id); break;
+  }
+}
+
+function onChange(e) {
+  const t = e.target;
+  if (t.matches('.cell-input')) {
+    editCell(t.closest('tr').dataset.row, t.dataset.col, t.value);
+    const dot = t.parentElement.querySelector('.dot');
+    if (dot) dot.dataset.tone = columnByKey(t.dataset.col)?.options?.find((o) => o.value === t.value)?.tone || 'solid';
+  } else if (t.id === 'period') { state.period = t.value; render(state); }
+  else if (t.id === 'from' || t.id === 'to') { state[t.id] = t.value; render(state); }
+  else if (t.id === 'sScope')  { state.statsScope = t.value; render(state); }
+  else if (t.id === 'sPeriod') { state.statsPeriod = t.value; render(state); }
+  else if (t.id === 'sFrom' || t.id === 'sTo') { state[t.id === 'sFrom' ? 'statsFrom' : 'statsTo'] = t.value; render(state); }
+  else if (t.id === 'logoInput') setLogoFromFile(t.files[0]);
+}
+function onInput(e) {
+  if (e.target.id === 'search') { state.search = e.target.value; renderTable(state); }
+}
+function onFocusOut(e) {
+  const t = e.target;
+  if (!t.dataset) return;
+  if ('label' in t.dataset) editLabel(t.dataset.label, t.textContent, t);
+  else if ('colLabel' in t.dataset) editColumnLabel(t.dataset.colLabel, t.textContent, t);
+}
+function onKeyDown(e) {
+  const t = e.target;
+  if (e.key === 'Enter' && !e.isComposing && (t.matches('input.cell-input') || t.isContentEditable)) {
+    e.preventDefault();
+    t.blur();
+    return;
+  }
+  if (t.matches('[role="tab"]') && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    const all = $$('[role="tab"]');                  // категории и «Статистика»
+    const next = all[(all.indexOf(t) + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length];
+    const id = next.id;
+    next.click();
+    $(`#${id}`)?.focus();
+  }
+}
+function onPaste(e) {
+  if (!e.target.isContentEditable) return;
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text/plain').replace(/\s+/g, ' ');
+  document.execCommand('insertText', false, text);
+}
+
+async function runCustomAction(id) {
+  const action = MY_ACTIONS.find((a) => a.id === id);
+  if (!action) return;
+  try { await action.run(); }
+  catch (err) { console.error(err); showMessage('Что-то пошло не так', String(err.message || err)); }
+}
+
+/* ==========================================================================
+   МОИ ФУНКЦИИ — сюда добавлять свой код.
+   Пункты из MY_ACTIONS появляются в меню «Действия» над таблицей.
+   Хуки подключаются в registerMyHooks() через on('событие', функция).
+   ========================================================================== */
+
+// Список своих действий: { id, label, run, editorOnly }
+const MY_ACTIONS = [
+  { id: 'tax',        label: 'Посчитать налог за период',       run: showTax },
+  { id: 'export-csv', label: 'Экспорт таблицы в CSV',           run: exportCsv },
+  { id: 'import-csv', label: 'Импорт из CSV в эту вкладку',     run: importCsv, editorOnly: true },
+  { id: 'backup',     label: 'Сохранить копию всех данных',     run: exportBackup },
+  { id: 'restore',    label: 'Восстановить из копии',           run: importBackup, editorOnly: true },
+  // { id: 'my-action', label: 'Моё действие', run: myFunctionA },   // сюда добавлять свой код
+];
+
+function registerMyHooks() {
+  // Примеры хуков (раскомментируйте и пишите свою логику):
+  // on('rowAdded',   ({ row })                  => { /* сюда добавлять свой код */ });
+  // on('cellEdited', ({ key, value, row })      => { /* сюда добавлять свой код */ });
+  // on('tabChanged', ({ tab })                  => { /* сюда добавлять свой код */ });
+}
+
+/* --- Пример 1: подсчёт налога. calcTax — чистая функция, её легко проверить. --- */
+const TAX_RATE = 0.06; // Пример: 6% с доходов. Поставьте свою ставку и свои правила.
+function calcTax(rows, rate = TAX_RATE) {
+  return calcTotals(rows).income * rate;
+}
+async function showTax() {
+  const rows = rowsInPeriod(state);
+  const periodLabel = CONFIG.periods.find((p) => p.value === state.period)?.label || '';
+  const income = calcTotals(rows).income;
+  await openDialog({
+    title: 'Налог за период',
+    text: `${periodLabel}. Доход ${fmtMoney(income, { digits: 0 })}, ставка ${TAX_RATE * 100}%: ${fmtMoney(calcTax(rows), { digits: 0 })}. Это пример расчёта, а не налоговая консультация.`,
+    ok: 'Закрыть', cancel: false,
+  });
+}
+
+/* --- Пример 2: экспорт в CSV (Excel открывает файл с разделителем «;») --- */
+function exportCsv() {
+  const tab = activeTab();
+  const header = state.columns.map((c) => c.label);
+  const lines = tab.rows.map((r) => state.columns.map((c) => {
+    if (c.type === 'money' || c.type === 'number') return String(parseNum(r[c.key])).replace('.', ',');
+    return formatValue(r[c.key], c);
+  }));
+  download(`${tab.name}.csv`, '\uFEFF' + toCsv([header, ...lines]), 'text/csv');
+}
+
+/* --- Пример 3: импорт из CSV. Заголовки сопоставляются с названиями колонок --- */
+async function importCsv() {
+  const file = await pickFile('.csv,text/csv');
+  if (!file) return;
+  const table = parseCsv(await readText(file));
+  if (table.length < 2) throw new Error('В файле нет строк с данными.');
+  const header = table[0].map((h) => h.trim().toLowerCase());
+  const map = state.columns.map((c) => header.findIndex((h) => h === c.label.toLowerCase() || h === c.key.toLowerCase()));
+  if (map.every((i) => i < 0)) throw new Error('Заголовки файла не совпадают с названиями колонок таблицы.');
+
+  const toValue = (raw, col) => {
+    raw = String(raw ?? '').trim();
+    if (col.type === 'money' || col.type === 'number') return parseNum(raw);
+    if (col.type === 'date') {
+      const m = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+      return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : (isISO(raw) ? raw : '');
+    }
+    if (col.type === 'select') return (col.options || []).find((o) => o.label.toLowerCase() === raw.toLowerCase() || o.value === raw)?.value ?? defaultValue(col);
+    return raw;
+  };
+  const tab = activeTab();
+  const added = table.slice(1).map((cells) => {
+    const row = { id: uid() };
+    state.columns.forEach((c, i) => { row[c.key] = map[i] >= 0 ? toValue(cells[map[i]], c) : defaultValue(c); });
+    return row;
+  });
+  tab.rows.push(...added);
+  commit('rowsImported', { tabId: tab.id, rows: added });
+}
+
+/* --- Резервная копия: пример работы со слоем Storage (export / import) --- */
+function exportBackup() { download('ledger-backup.json', Storage.export(state), 'application/json'); }
+async function importBackup() {
+  const file = await pickFile('.json,application/json');
+  if (!file) return;
+  applyData(Storage.import(await readText(file)));
+  commit('stateLoaded', state, { swap: true });
+}
+
+/* --- Пустые заготовки --- */
+function myFunctionA() {
+  // сюда добавлять свой код
+}
+function myFunctionB() {
+  // сюда добавлять свой код
+}
+
+/* ==========================================================================
+   INIT — запуск
+   ========================================================================== */
+function init() {
+  const saved = Storage.load();
+  applyData(saved || createSeedData());
+  if (!saved) Storage.save(state);
+  bindEvents();
+  registerMyHooks();
+  render(state);
+  emit('stateLoaded', state);
+}
+
+// Для отладки и расширения из консоли: App.state, App.on(...), App.render(App.state)
+window.App = { state, CONFIG, Storage, on, emit, render, commit };
+
+init();
+})();
+</script>
+<!-- ===================== АНИМАЦИИ (добавлено, остальной код не тронут) ===================== -->
+<style id="motion-css">
+/* Меняйте скорость тут */
+:root { --m-dur: 320ms; --m-ease: cubic-bezier(0.23, 1, 0.32, 1); }
+@keyframes m-grow  { from { transform: scaleY(0); } }
+@keyframes m-scalex{ from { transform: scaleX(0); } }
+@keyframes m-fade  { from { opacity: 0; } }
+@keyframes m-rise  { from { opacity: 0; transform: translateY(6px); } }
+@keyframes m-drop  { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+
+/* Столбцы графика растут снизу по очереди */
+#chart .bar { transform-box: fill-box; transform-origin: 50% 100%; will-change: transform;
+  animation: m-grow .7s var(--m-ease) backwards; animation-delay: calc(var(--k, 0) * 45ms + 150ms); }
+#chart .axis, #chart .legend { animation: m-fade .5s ease .5s backwards; }
+/* Доли: линия «заливается» слева, строки выезжают по очереди */
+#breakdown li { animation: m-rise .4s var(--m-ease) backwards; animation-delay: calc(var(--k, 0) * 45ms); }
+.share-fill { transform-origin: 0 50%; animation: m-scalex .8s var(--m-ease) backwards; animation-delay: calc(var(--k, 0) * 45ms + 150ms); }
+/* Меню действий */
+.menu[open] .menu-list { transform-origin: top right; animation: m-drop 180ms var(--m-ease); }
+/* Плавное подсвечивание строк и карточек */
+tbody td { transition: background-color 150ms var(--m-ease); }
+.card { transition: transform 200ms var(--m-ease); }
+@media (hover: hover) and (pointer: fine) { .card:hover { transform: translateY(-2px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  #chart .bar, .share-fill { animation-name: m-fade; }
+  #breakdown li { animation-name: m-fade; }
+  .menu[open] .menu-list { animation-name: m-fade; }
+  .card:hover { transform: none; }
+}
+</style>
+<script id="motion-js">
+/* Слой анимаций: наблюдает за DOM и анимирует то, что отрисовал render(). Логику приложения не трогает. */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const EASE = 'cubic-bezier(0.23, 1, 0.32, 1)';
+  const $ = (s) => document.querySelector(s);
+  const idx = (root, sel) => root.querySelectorAll(sel).forEach((el, i) => el.style.setProperty('--k', i));
+
+  /* ---- Таблица: новые строки появляются каскадом, старые плавно переезжают (FLIP) при сортировке/удалении ---- */
+  const table = $('#table');
+  let tops = new Map();
+  const snap = () => { tops = new Map(); table.querySelectorAll('tbody tr[data-row]').forEach((r) => tops.set(r.dataset.row, r.offsetTop)); };
+  new MutationObserver(() => {
+    const rows = [...table.querySelectorAll('tbody tr[data-row]')];
+    if (!table.offsetParent) { snap(); return; }
+    let n = 0, fresh = 0;
+    rows.forEach((r) => {
+      const prev = tops.get(r.dataset.row);
+      if (prev == null) {
+        fresh++;
+        r.animate(reduce.matches ? { opacity: [0, 1] } : { opacity: [0, 1], transform: ['translateY(8px)', 'none'] },
+          { duration: 320, easing: EASE, delay: Math.min(n++, 16) * 28, fill: 'backwards' });
+      } else if (!reduce.matches) {
+        const dy = prev - r.offsetTop;
+        if (dy) r.animate({ transform: [`translateY(${dy}px)`, 'none'] }, { duration: 380, easing: EASE });
+      }
+    });
+    if (fresh === rows.length) table.querySelectorAll('thead th').forEach((th, i) =>
+      th.animate({ opacity: [0, 1] }, { duration: 300, delay: i * 40, fill: 'backwards' }));
+    snap();
+  }).observe(table, { childList: true });
+
+  /* ---- Вкладки: первое появление каскадом, подчёркивание «выезжает» у выбранной ---- */
+  const tabs = $('#tabs');
+  let tabsFirst = true;
+  new MutationObserver(() => {
+    if (tabsFirst) {
+      tabsFirst = false;
+      tabs.querySelectorAll('.tab').forEach((t, i) => t.animate(
+        { opacity: [0, 1], transform: ['translateY(4px)', 'none'] },
+        { duration: 300, easing: EASE, delay: 120 + i * 50, fill: 'backwards' }));
+      return;
+    }
+    const sel = tabs.querySelector('[aria-selected="true"]');
+    if (sel && !reduce.matches) sel.animate({ transform: matchMedia('(min-width: 900px)').matches ? ['scaleY(0)', 'scaleY(1)'] : ['scaleX(0)', 'scaleX(1)'] },
+      { duration: 260, easing: EASE, pseudoElement: '::after' });
+  }).observe(tabs, { childList: true });
+
+  /* ---- Числа в карточках: счёт от старого значения к новому ---- */
+  const NUM = /\d[\d\s\u00a0\u202f]*(?:[.,]\d+)?/;
+  const parse = (t) => { const m = t.match(NUM); if (!m) return null;
+    const dec = (m[0].match(/[.,](\d+)$/) || [0, ''])[1].length;
+    return { m, dec, v: parseFloat(m[0].replace(/[\s\u00a0\u202f]/g, '').replace(',', '.')) }; };
+  const watch = (el) => {
+    let own = el.textContent, from = (parse(own) || {}).v || 0, raf = 0;
+    new MutationObserver(() => {
+      const target = el.textContent;
+      if (target === own) return;
+      cancelAnimationFrame(raf);
+      const p = parse(target);
+      if (!p || reduce.matches) { own = target; from = p ? p.v : 0; return; }
+      const fmt = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: p.dec, maximumFractionDigits: p.dec });
+      const t0 = performance.now(), a = from, b = p.v;
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / 700), e = 1 - Math.pow(1 - k, 4);
+        own = k < 1 ? target.replace(p.m[0], fmt.format(a + (b - a) * e)) : target;
+        el.textContent = own;
+        if (k < 1) raf = requestAnimationFrame(step); else from = b;
+      };
+      raf = requestAnimationFrame(step);
+    }).observe(el, { childList: true, characterData: true, subtree: true });
+  };
+  ['valIncome', 'valExpense', 'valBalance', 'sValIncome', 'sValExpense', 'sValBalance']
+    .forEach((id) => { const el = document.getElementById(id); if (el) watch(el); });
+
+  /* ---- Задержки по очереди для графика и долей ---- */
+  const chart = $('#chart'), br = $('#breakdown');
+  if (chart) new MutationObserver(() => idx(chart, '.bar')).observe(chart, { childList: true });
+  if (br) new MutationObserver(() => idx(br, 'li')).observe(br, { childList: true });
+  if (chart) idx(chart, '.bar'); if (br) idx(br, 'li');
+})();
+</script>
+<style id="theme-layout-css">
+/* ===== Тёмная тема: только переопределение токенов ===== */
+:root[data-theme="dark"]{
+  --color-bg:#0b0b0c; --color-ink:#f2f2f2; --color-ink-soft:#c9c9c9; --color-muted:#9a9a9f;
+  --color-line:#242427; --color-line-strong:#3b3b40; --color-hover:#151517; --color-accent:#8aa0ff;
+  color-scheme:dark;
+}
+html.theming *, html.theming *::before, html.theming *::after{
+  transition-property:background-color,color,border-color,fill,stroke,opacity !important;
+  transition-duration:.45s !important; transition-timing-function:ease !important;
+}
+.topbar{gap:var(--space-2)} .topbar .logo{margin-right:auto}
+.theme-btn{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--color-line-strong);
+  border-radius:50%;color:var(--color-ink);flex:none}
+.theme-btn:active{transform:scale(.94)}
+.theme-btn svg{width:20px;height:20px;overflow:visible}
+.theme-btn .core{transform:scale(.56);transform-origin:12px 12px;transition:transform .5s var(--ease-out)}
+.theme-btn .cut{transform:translate(14px,-14px);transition:transform .5s var(--ease-out)}
+.theme-btn .rays{transform-origin:12px 12px;transition:transform .5s var(--ease-out),opacity .5s}
+:root[data-theme="dark"] .theme-btn .core{transform:scale(1)}
+:root[data-theme="dark"] .theme-btn .cut{transform:none}
+:root[data-theme="dark"] .theme-btn .rays{transform:rotate(-70deg) scale(.4);opacity:0}
+@media (hover:hover) and (pointer:fine){.theme-btn:hover{background:var(--color-hover)}}
+
+/* ===== Левое меню: категории и «Статистика» (от 900 px) ===== */
+@keyframes m-side{from{opacity:0;transform:translateX(-12px)}}
+@media (min-width:900px){
+  body{padding-left:248px}
+  .tabs-bar{position:fixed;inset:0 auto 0 0;width:248px;z-index:3;margin:0;padding:var(--space-5) var(--space-3);
+    flex-direction:column;align-items:stretch;justify-content:flex-start;gap:var(--space-2);
+    border-bottom:0;border-right:1px solid var(--color-line);background:var(--color-bg);overflow-y:auto}
+  .tabs-bar.reveal{animation-name:m-side}
+  .tabs{flex-direction:column;gap:2px;overflow:visible}
+  .tab{padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);text-align:left;white-space:normal}
+  .tab::after{inset:6px auto 6px 0;width:2px;height:auto;border-radius:2px;transform:scaleY(0);transform-origin:50% 50%}
+  .tab[aria-selected="true"]{background:var(--color-hover)}
+  .tab[aria-selected="true"]::after{transform:scaleY(1)}
+  @media (hover:hover) and (pointer:fine){.tab:hover{background:var(--color-hover)}}
+  .tab-stats{margin:var(--space-3) 0 0;border-top:1px solid var(--color-line);border-radius:0 0 var(--radius-sm) var(--radius-sm);padding-top:var(--space-3)}
+  .tab-stats::after{top:calc(var(--space-3) + 6px)}
+  .tab-add{padding:var(--space-2) var(--space-3);text-align:left}
+  .intro{margin-top:var(--space-2)}
+}
+</style>
+<script id="theme-js">
+(() => {
+  const root = document.documentElement;
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'theme-btn'; b.id = 'themeToggle'; b.setAttribute('aria-label', 'Переключить тему');
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><mask id="thm"><rect x="-8" y="-8" width="40" height="40" fill="#fff"/><circle class="cut" cx="15" cy="9" r="7" fill="#000"/></mask><circle class="core" cx="12" cy="12" r="9" fill="currentColor" stroke="none" mask="url(#thm)"/><g class="rays"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g></svg>';
+  document.querySelector('.topbar').appendChild(b);
+  const set = (t, save) => {
+    root.dataset.theme = t;
+    b.setAttribute('aria-pressed', String(t === 'dark'));
+    const m = (n, v) => { const e = document.querySelector('meta[name="' + n + '"]'); if (e) e.content = v; };
+    m('color-scheme', t); m('theme-color', t === 'dark' ? '#0b0b0c' : '#ffffff');
+    if (save) try { localStorage.setItem('theme', t); } catch (e) {}
+  };
+  set(root.dataset.theme);
+  b.onclick = () => {
+    root.classList.add('theming'); setTimeout(() => root.classList.remove('theming'), 500);
+    set(root.dataset.theme === 'dark' ? 'light' : 'dark', true);
+  };
+  /* Меню слева: стрелки вверх/вниз работают как вправо/влево */
+  const tabs = document.getElementById('tabs');
+  tabs.addEventListener('keydown', (e) => {
+    const k = { ArrowDown: 'ArrowRight', ArrowUp: 'ArrowLeft' }[e.key];
+    if (!k) return;
+    e.preventDefault(); e.stopPropagation();
+    e.target.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+  }, true);
+})();
+</script>
+</body>
+</html>
