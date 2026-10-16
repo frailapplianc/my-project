@@ -1,0 +1,276 @@
+<!-- ===================== СЛОЙ СОВМЕСТИМОСТИ: CSS из index 4.html в токенах дизайна 1111.html ===================== -->
+<style id="compat-css">
+/* ===== БАЗА ===== */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.hidden{display:none!important}
+
+/* ===== ТОКЕНЫ ЦВЕТОВ (значения из index-4; нужны элементам, которых нет в дизайне: фон-эффекты, дашборд) ===== */
+:root[data-theme="dark"]{
+  --bg:#05060a;
+  --surface:rgba(255,255,255,.038);
+  --field:rgba(255,255,255,.05);
+  --border:rgba(255,255,255,.07);
+  --border-strong:rgba(255,255,255,.17);
+  --text:#e7eaf2;
+  --muted-c:#7e8798;
+  --accent:#6d8bff;
+  --accent-soft:rgba(109,139,255,.14);
+  --green:#3ddc97; --green-soft:rgba(61,220,151,.13);
+  --yellow:#f5c04e; --yellow-soft:rgba(245,192,78,.13);
+  --red:#ff7a7a; --red-soft:rgba(255,122,122,.13);
+  --shadow-card:0 1px 0 rgba(255,255,255,.04) inset,0 18px 40px -24px rgba(0,0,0,.9);
+}
+:root[data-theme="light"]{
+  --bg:#eef0f5;
+  --surface:rgba(255,255,255,.72);
+  --field:rgba(15,23,42,.03);
+  --border:rgba(15,23,42,.1);
+  --border-strong:rgba(15,23,42,.24);
+  --text:#12151d;
+  --muted-c:#5d6678;
+  --accent:#4c6ef5;
+  --accent-soft:rgba(76,110,245,.12);
+  --green:#0f9d63; --green-soft:rgba(15,157,99,.13);
+  --yellow:#9a6b15; --yellow-soft:rgba(154,107,21,.14);
+  --red:#d64545; --red-soft:rgba(214,69,69,.12);
+  --shadow-card:0 1px 2px rgba(15,23,42,.05),0 12px 32px -18px rgba(15,23,42,.25);
+}
+
+/* ===== ФОНОВЫЕ ЭФФЕКТЫ (из index-4, как есть) ===== */
+.bg-fx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bg-glow{position:absolute;width:60vw;height:60vw;left:-10vw;top:-24vw;border-radius:50%;
+  background:radial-gradient(circle at center,rgba(109,139,255,.16),transparent 62%);filter:blur(30px)}
+[data-theme="light"] .bg-glow{background:radial-gradient(circle at center,rgba(76,110,245,.13),transparent 62%)}
+.bg-grid{position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 30%,transparent 100%);
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 30%,transparent 100%)}
+
+/* ===== ОБЩИЕ ЭЛЕМЕНТЫ: те же роли, что в дизайне, — берём токены дизайна ===== */
+/* Точки-индикаторы (банк без логотипа, статусы): тот же приём, что «статус» в дизайне */
+.dot[data-tone="gray"]{background:var(--color-muted)}
+.dot[data-tone="yellow"]{background:var(--yellow)}
+.dot[data-tone="green"]{background:var(--green)}
+.dot[data-tone="red"]{background:var(--red)}
+.muted{color:var(--color-muted)}
+.neg{color:var(--red)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.spacer{flex:1}
+.view-title{font-size:var(--fs-lg);font-weight:var(--fw-semibold);letter-spacing:-0.01em;margin-bottom:var(--space-3);display:flex;align-items:baseline;gap:var(--space-2)}
+.empty{padding:var(--space-5);text-align:center;color:var(--color-muted);font-size:var(--fs-base)}
+
+.btn{font-family:inherit;font-size:var(--fs-base);font-weight:var(--fw-medium);line-height:1;
+  min-height:var(--control-h);padding:0 var(--space-3);border-radius:var(--radius-sm);cursor:pointer;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.btn-primary{background:var(--color-ink);color:var(--color-bg);border:1px solid var(--color-ink)}
+.btn-danger{color:#d64545}
+:root[data-theme="dark"] .btn-danger{color:#ff7a7a}
+.icon-btn{width:32px;height:32px;display:inline-grid;place-items:center;background:none;border:1px solid transparent;
+  border-radius:var(--radius-sm);cursor:pointer;font-size:var(--fs-base);color:var(--color-muted);font-family:inherit;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .icon-btn:hover{border-color:var(--color-line-strong);background:var(--color-hover);color:var(--color-ink)}
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),select,textarea{font-family:inherit}
+input[type="date"],input[type="search"],input[type="text"],input[type="number"],input[type="password"],select,textarea{
+  color-scheme:inherit}
+.dt,.amt{padding:var(--space-1) 0;border:0;border-bottom:1px solid var(--color-line-strong);border-radius:0;
+  background:transparent;color:var(--color-ink);font-size:var(--fs-base);font-family:inherit;
+  transition:border-color var(--dur-fast) var(--ease-out)}
+.amt{width:120px;text-align:right;font-variant-numeric:tabular-nums}
+.dt:focus,.amt:focus{outline:none;border-bottom-color:var(--color-accent)}
+.st-select{appearance:none;-webkit-appearance:none;padding:var(--space-1) 0;border:0;border-bottom:1px solid var(--color-line-strong);
+  border-radius:0;background:transparent;color:var(--color-ink);font-size:var(--fs-base);font-family:inherit;cursor:pointer}
+.st-select.gray{color:var(--color-muted)}
+.st-select.yellow{color:var(--yellow)}
+.st-select.green{color:var(--green)}
+.st-select.red{color:var(--red)}
+
+/* Карточка-секция: роль .card из index-4 выполняет .block дизайна */
+.card-h{padding:0 0 var(--space-2);border-bottom:1px solid var(--color-line);font-size:var(--fs-base);
+  font-weight:var(--fw-semibold);letter-spacing:-0.01em;display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3)}
+
+/* Итоги-полоса: карточки дизайна */
+.sumbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-3);margin-bottom:var(--space-4)}
+.sum{display:flex;flex-direction:column;gap:4px}
+.sum-l{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-muted);font-weight:var(--fw-medium);white-space:nowrap}
+.sum-v{font-size:var(--fs-md);font-weight:var(--fw-semibold);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;color:var(--color-ink)}
+.sum-v.ok{color:var(--green)}
+.sum-v.warn{color:var(--red)}
+
+/* Панель инструментов: стиль .toolbar дизайна */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2);margin-bottom:var(--space-4)}
+.search{min-width:220px;flex:1}
+
+/* Чипы-статусы: приём «точка + подпись» из статусов дизайна */
+.st-badge{display:inline-flex;align-items:center;gap:var(--space-2);white-space:nowrap;font-size:var(--fs-sm);color:var(--color-ink)}
+.st-badge .bdot{flex:none;width:6px;height:6px;border-radius:50%;border:1px solid currentColor;background:currentColor}
+.st-badge.gray{color:var(--color-muted)}
+.st-badge.yellow{color:var(--yellow)}
+.st-badge.green{color:var(--green)}
+.st-badge.red{color:var(--red)}
+
+/* Таблица журнала: стиль таблицы дизайна */
+table{width:100%;border-collapse:collapse;font-size:var(--fs-base)}
+th{text-align:left;font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-muted);
+  padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-line-strong);white-space:nowrap;font-weight:var(--fw-medium)}
+td{padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--color-line);vertical-align:middle}
+.table-wrap{overflow-x:auto}
+tbody tr{animation:fade var(--dur) var(--ease-out) backwards}
+
+/* Развёртывающиеся ячейки */
+.cell-stack{display:grid;gap:var(--space-1);padding:var(--space-1) 0}
+.chip-toggle{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);width:100%;
+  padding:var(--space-1) 0;border:0;border-bottom:1px solid var(--color-line);border-radius:0;background:transparent;
+  color:var(--color-ink);cursor:pointer;font-family:inherit;font-size:var(--fs-base);text-align:left;
+  font-variant-numeric:tabular-nums;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  transition:border-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.chip-toggle:hover{border-bottom-color:var(--color-ink);color:var(--color-accent)}}
+.chip-right{display:inline-flex;align-items:center;gap:var(--space-2);margin-left:auto}
+.chip-caret{color:var(--color-muted);font-size:var(--fs-xs);transition:transform var(--dur) var(--ease-out)}
+.cell-stack.open .chip-caret{transform:rotate(180deg)}
+.chip-body{display:none;gap:var(--space-3);padding-top:var(--space-1)}
+.cell-stack.open .chip-body{display:grid;animation:fade var(--dur) var(--ease-out)}
+.chip-field{display:grid;gap:var(--space-1)}
+.chip-field label{font-size:var(--fs-xs);color:var(--color-muted)}
+.chip-field .dt,.chip-field .amt,.chip-field .st-select{width:100%}
+
+/* Ссылка на профиль в таблице */
+.fio-link{display:grid;gap:2px;text-align:left;color:var(--color-ink);transition:color var(--dur-fast) var(--ease-out)}
+.fio-row{display:inline-flex;align-items:center;gap:var(--space-2);min-width:0}
+.fio-row b{font-weight:var(--fw-medium);overflow-wrap:anywhere}
+.fio-feo{font-size:var(--fs-xs);color:var(--color-muted)}
+.b-ico{width:18px;height:18px;border-radius:var(--radius-sm);display:block;object-fit:contain;flex:none}
+.dot{flex:none;width:10px;height:10px;border-radius:50%}
+.actions-cell{white-space:nowrap;text-align:right}
+
+/* Фильтр-чипы банков */
+.bankbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2);margin-bottom:var(--space-4)}
+.bankbar .lbl{font-size:var(--fs-sm);color:var(--color-muted);margin-right:var(--space-1)}
+.chip{display:inline-flex;align-items:center;gap:var(--space-2);min-height:30px;padding:0 var(--space-2);
+  border:1px solid var(--color-line-strong);border-radius:var(--radius-sm);background:transparent;color:var(--color-ink);
+  font-size:var(--fs-sm);font-weight:var(--fw-medium);white-space:nowrap;cursor:pointer;font-family:inherit;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.chip:active{transform:scale(.97)}
+.chip .cnt{color:var(--color-muted);font-variant-numeric:tabular-nums}
+.chip .c-ico{width:16px;height:16px;border-radius:var(--radius-sm);display:block;object-fit:contain;flex:none}
+.chip.active{border-color:var(--color-ink);background:var(--color-hover)}
+@media (hover:hover) and (pointer:fine){.chip:hover{background:var(--color-hover)}}
+
+/* Дашборд (вкладка «Сводка») */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--space-3);margin-bottom:var(--space-4)}
+.stat-big{display:flex;flex-direction:column;gap:6px}
+.stat-big .lbl{font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-muted);font-weight:var(--fw-medium)}
+.stat-big .val{font-size:var(--fs-xl);font-weight:var(--fw-semibold);letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:var(--color-ink)}
+.stat-big .val.ok{color:var(--green)}
+.stat-big .val.warn{color:var(--red)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:190px;padding:var(--space-2) 0 0}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.bar-stack{display:flex;flex-direction:column-reverse;align-items:center;gap:2px;width:100%}
+.bar-seg{width:min(22px,70%);border-radius:var(--radius-bar);transition:height .4s var(--ease-out)}
+.bar-seg.mat{background:var(--color-ink)}
+.bar-seg.pay{background:var(--color-line-strong)}
+.bar-lbl{font-size:var(--fs-xs);color:var(--color-muted);white-space:nowrap}
+.legend .key{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-sm);color:var(--color-muted)}
+.legend .sw{width:10px;height:10px;border-radius:var(--radius-bar);display:inline-block}
+.bank{display:inline-flex;align-items:center;gap:var(--space-2)}
+
+/* Модальный диалог: структура index-4 в оболочке dialog дизайна */
+dialog.dialog-wide{width:min(640px,calc(100vw - 32px))}
+dialog .body{display:grid;gap:var(--space-3)}
+dialog .foot{display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-2)}
+.field{display:grid;gap:var(--space-1)}
+.field label{font-size:var(--fs-sm);color:var(--color-muted)}
+.field input:not([type="file"]):not([type="color"]),.field select,.field textarea{
+  width:100%;height:var(--control-h);padding:var(--space-2) 0;background:transparent;border:0;
+  border-bottom:1px solid var(--color-line-strong);border-radius:0;color:var(--color-ink);
+  font-family:inherit;font-size:var(--fs-base);
+  transition:border-color var(--dur-fast) var(--ease-out)}
+.field textarea{height:auto;min-height:64px;resize:vertical;line-height:1.4}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-bottom-color:var(--color-accent)}
+.field input[type="file"]{border:0;padding-left:0}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+@media (max-width:640px){.f2{grid-template-columns:1fr}}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)}
+.sep{border:0;border-top:1px solid var(--color-line);margin:var(--space-1) 0}
+.hint{font-size:var(--fs-xs);color:var(--color-muted);text-wrap:pretty}
+
+/* Фото паспорта */
+.pass-photo{position:relative;display:flex;align-items:center;justify-content:center;min-height:96px;
+  padding:var(--space-2);cursor:pointer;border-bottom:1px solid var(--color-line-strong);
+  background:transparent;color:var(--color-muted);font-size:var(--fs-sm);
+  transition:background-color var(--dur-fast) var(--ease-out)}
+.pass-photo img{max-height:140px;max-width:100%;display:block}
+.ph-x{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:var(--color-ink);
+  color:var(--color-bg);font-size:10px;line-height:1;display:grid;place-items:center}
+.ph-hint{color:var(--color-muted)}
+
+/* Управление банками */
+.bank-row{display:flex;align-items:center;gap:var(--space-2)}
+.bank-row+.bank-row{margin-top:var(--space-2)}
+.bank-row .field{flex:1;display:block}
+.bank-row input[type="text"]{width:100%;height:var(--control-h);padding:var(--space-2) 0;background:transparent;
+  border:0;border-bottom:1px solid var(--color-line-strong);border-radius:0;color:var(--color-ink);
+  font-family:inherit;font-size:var(--fs-base)}
+.bank-logo-slot{position:relative;display:inline-grid;place-items:center;width:32px;height:32px;flex:none;
+  cursor:pointer;border-radius:var(--radius-sm)}
+.bank-logo-slot img{width:28px;height:28px;object-fit:contain;display:block}
+input[type="color"].bankColorInput,input[type="color"]#newBankColor{width:28px;height:28px;padding:0;flex:none;
+  border:1px solid var(--color-line-strong);border-radius:var(--radius-sm);background:transparent;cursor:pointer}
+
+/* Сообщение (toast) */
+#toast{position:fixed;left:50%;bottom:var(--space-5);z-index:20;transform:translate(-50%,8px);opacity:0;
+  pointer-events:none;max-width:min(420px,calc(100vw - 32px));padding:var(--space-2) var(--space-3);
+  background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);border-radius:var(--radius-md);
+  box-shadow:0 8px 24px rgba(0,0,0,.08);font-size:var(--fs-sm);text-align:center;
+  transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-out)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{border-color:var(--color-ink)}
+
+/* Экран входа по паролю */
+#passOverlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--color-bg) 70%,transparent);animation:fade var(--dur) var(--ease-out)}
+.pass-box{width:min(360px,calc(100vw - 32px));padding:var(--space-4);display:grid;gap:var(--space-3);
+  background:var(--color-bg);color:var(--color-ink);border:1px solid var(--color-line);border-radius:var(--radius-md);
+  animation:pop var(--dur) var(--ease-out)}
+.pass-title{font-size:var(--fs-lg);font-weight:var(--fw-semibold);letter-spacing:-0.01em}
+.pass-box form{display:flex;gap:var(--space-2);align-items:flex-end}
+.pass-box #passEntry{flex:1;height:var(--control-h);padding:var(--space-2) 0;background:transparent;border:0;
+  border-bottom:1px solid var(--color-line-strong);color:var(--color-ink);font-family:inherit;font-size:var(--fs-base)}
+#passErr{min-height:1.2em;font-size:var(--fs-sm);color:#d64545}
+:root[data-theme="dark"] #passErr{color:#ff7a7a}
+
+/* Индикатор сохранения в шапке */
+.save-info{display:inline-flex;align-items:center;gap:var(--space-2);font-size:var(--fs-xs);color:var(--color-muted);white-space:nowrap}
+.save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2.4s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Логотип: клик-загрузка в стиле слота логотипа дизайна */
+.logo-img{display:inline-flex;align-items:center}
+.logo-img img{max-width:120px;max-height:40px;object-fit:contain;display:block}
+.logo-default{font-size:var(--fs-md);color:var(--color-muted)}
+#logoZone{cursor:pointer}
+.logo-x{display:none}
+
+/* Печать */
+.print-only{display:none}
+@media print{
+  .topbar,.tabs-bar,.tab-tools,.toolbar,.bankbar,#menu,.table-foot,#toast,#passOverlay,.theme-btn,
+  .actions-cell,.chip-caret,.save-info,.bg-fx{display:none!important}
+  .print-only{display:block;margin-bottom:var(--space-3);color:var(--color-muted);font-size:var(--fs-sm)}
+  body{background:#fff;color:#000}
+}
+
+/* Адаптив добавленных блоков */
+@media (max-width:900px){.cards-5{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.cards-5{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  tbody tr,.cell-stack.open .chip-body,#passOverlay,.pass-box{animation-name:fade}
+  .chip-caret,#toast{transition:none}
+}
+</style>

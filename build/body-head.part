@@ -1,0 +1,115 @@
+<body>
+<div class="container">
+
+  <header class="topbar reveal" style="--i:0">
+    <div class="logo" id="logo"></div>
+    <button class="switch" id="editorToggle" type="button" role="switch" aria-checked="false" data-action="toggle-editor">
+      <span>Режим редактора</span>
+      <span class="switch-track" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <section class="intro reveal" style="--i:1">
+    <h1 data-label="title"></h1>
+    <p data-label="subtitle"></p>
+  </section>
+
+  <div class="tabs-bar reveal" style="--i:2">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Категории"></div>
+    <button class="btn-link tab-add" type="button" id="addTab" data-action="add-tab" hidden>Добавить вкладку</button>
+  </div>
+  <div class="tab-tools" id="tabTools" hidden>
+    <button class="btn-link" type="button" data-action="rename-tab">Переименовать</button>
+    <button class="btn-link" type="button" data-action="move-left" id="moveLeft">Сдвинуть влево</button>
+    <button class="btn-link" type="button" data-action="move-right" id="moveRight">Сдвинуть вправо</button>
+    <button class="btn-link" type="button" data-action="delete-tab" id="deleteTab">Удалить вкладку</button>
+  </div>
+
+  <div id="content" role="tabpanel">
+
+  <!-- Вкладка категории: карточки и таблица -->
+  <div id="viewData">
+
+    <section class="cards reveal" style="--i:3" aria-label="Показатели">
+      <div class="card"><p class="card-label" data-label="cardIncome"></p><p class="card-value" id="valIncome"></p></div>
+      <div class="card"><p class="card-label" data-label="cardExpense"></p><p class="card-value" id="valExpense"></p></div>
+      <div class="card"><p class="card-label" data-label="cardBalance"></p><p class="card-value" id="valBalance"></p></div>
+    </section>
+
+    <section class="block reveal" style="--i:4">
+      <div class="block-head">
+        <h2 data-label="tableTitle"></h2>
+        <details class="menu" id="menu">
+          <summary class="btn">Действия</summary>
+          <div class="menu-list" id="menuList"></div>
+        </details>
+      </div>
+
+      <div class="toolbar">
+        <input class="field field-search" id="search" type="search" placeholder="Поиск" aria-label="Поиск по операциям" autocomplete="off">
+        <label class="select"><select id="period" aria-label="Период"></select></label>
+        <div class="range" id="range" hidden>
+          <input class="field" type="date" id="from" aria-label="С даты">
+          <span>до</span>
+          <input class="field" type="date" id="to" aria-label="По дату">
+        </div>
+      </div>
+
+      <div class="table-wrap"><table id="table"></table></div>
+      <p class="empty" id="tableEmpty" hidden></p>
+      <div class="table-foot">
+        <span id="tableCount"></span>
+        <button class="btn" type="button" id="addRow" data-action="add-row" hidden>Добавить строку</button>
+      </div>
+      <datalist id="dl-categories"></datalist>
+    </section>
+
+  </div><!-- /viewData -->
+
+  <!-- Вкладка «Статистика»: итоги, график и разбивка по выбранным данным -->
+  <div id="viewStats" hidden>
+
+    <section class="block block-first reveal" style="--i:3">
+      <div class="block-head"><h2 data-label="statsTitle"></h2></div>
+      <div class="toolbar">
+        <label class="select"><select id="sScope" aria-label="Что учитывать"></select></label>
+        <label class="select"><select id="sPeriod" aria-label="Период"></select></label>
+        <div class="range" id="sRange" hidden>
+          <input class="field" type="date" id="sFrom" aria-label="С даты">
+          <span>до</span>
+          <input class="field" type="date" id="sTo" aria-label="По дату">
+        </div>
+      </div>
+    </section>
+
+    <section class="cards reveal" style="--i:4" aria-label="Показатели статистики">
+      <div class="card"><p class="card-label" data-label="cardIncome"></p><p class="card-value" id="sValIncome"></p></div>
+      <div class="card"><p class="card-label" data-label="cardExpense"></p><p class="card-value" id="sValExpense"></p></div>
+      <div class="card"><p class="card-label" data-label="cardBalance"></p><p class="card-value" id="sValBalance"></p></div>
+    </section>
+
+    <section class="block analytics reveal" style="--i:5">
+      <div class="analytics-grid">
+        <div>
+          <h2 data-label="chartTitle"></h2>
+          <div id="chart"></div>
+        </div>
+        <div>
+          <div class="breakdown-head">
+            <h2 data-label="breakdownTitle"></h2>
+            <div class="seg" role="group" aria-label="Что показывать">
+              <button type="button" data-action="breakdown" data-kind="expense">Расходы</button>
+              <button type="button" data-action="breakdown" data-kind="income">Доходы</button>
+            </div>
+          </div>
+          <ul id="breakdown"></ul>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /viewStats -->
+
+  </div>
+</div>
+
+<dialog id="dialog"></dialog>

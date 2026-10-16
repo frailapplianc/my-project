@@ -1,0 +1,95 @@
+<!-- ===================== АДАПТАЦИЯ ФУНКЦИОНАЛА (логика из index 4.html) ===================== -->
+<style id="compat-css">
+/* ===== Стили из index 4.html, перенесены без изменений ===== */
+/* ===== БАЗА ===== */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.hidden{display:none!important}
+
+/* ===== ТОКЕНЫ ТЁМНОЙ ТЕМЫ (значения из index-4; имена переменных — как в дизайне 1111) ===== */
+:root[data-theme="dark"]{
+  --bg:#05060a;
+  --surface:rgba(255,255,255,.038);
+  --field:rgba(255,255,255,.05);
+  --border:rgba(255,255,255,.07);
+  --border-strong:rgba(255,255,255,.17);
+  --text:#e7eaf2;
+  --muted-c:#7e8798;
+  --accent:#6d8bff;
+  --accent-soft:rgba(109,139,255,.14);
+  --green:#3ddc97; --green-soft:rgba(61,220,151,.13);
+  --yellow:#f5c04e; --yellow-soft:rgba(245,192,78,.13);
+  --red:#ff7a7a; --red-soft:rgba(255,122,122,.13);
+  --shadow-card:0 1px 0 rgba(255,255,255,.04) inset,0 18px 40px -24px rgba(0,0,0,.9);
+}
+:root[data-theme="light"]{
+  --bg:#eef0f5;
+  --surface:rgba(255,255,255,.72);
+  --field:rgba(15,23,42,.03);
+  --border:rgba(15,23,42,.1);
+  --border-strong:rgba(15,23,42,.24);
+  --text:#12151d;
+  --muted-c:#5d6678;
+  --accent:#4c6ef5;
+  --accent-soft:rgba(76,110,245,.12);
+  --green:#0f9d63; --green-soft:rgba(15,157,99,.13);
+  --yellow:#9a6b15; --yellow-soft:rgba(154,107,21,.14);
+  --red:#d64545; --red-soft:rgba(214,69,69,.12);
+  --shadow-card:0 1px 2px rgba(15,23,42,.05),0 12px 32px -18px rgba(15,23,42,.25);
+}
+
+/* ===== ЭЛЕМЕНТЫ, КОТОРЫХ НЕТ В ДИЗАЙНЕ (перенесены из index-4 как есть) ===== */
+.bg-fx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bg-glow{position:absolute;width:60vw;height:60vw;left:-10vw;top:-24vw;border-radius:50%;
+  background:radial-gradient(circle at center,rgba(109,139,255,.16),transparent 62%);filter:blur(30px)}
+[data-theme="light"] .bg-glow{background:radial-gradient(circle at center,rgba(76,110,245,.13),transparent 62%)}
+.bg-grid{position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 30%,transparent 100%);
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 30%,transparent 100%)}
+
+.nav-item.active{background:var(--color-hover);color:var(--color-ink)}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:14px}
+.stat-big{padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.stat-big .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--color-muted);font-weight:600}
+.stat-big .val{font-size:22px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat-big .val.ok{color:var(--green)}
+.stat-big .val.warn{color:var(--red)}
+
+.bars{display:flex;align-items:flex-end;gap:6px;height:190px;padding:10px 6px 0}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.bar-stack{display:flex;flex-direction:column-reverse;align-items:center;gap:2px;width:100%}
+.bar-seg{width:min(22px,70%);border-radius:3px;transition:height .4s var(--ease-out)}
+.bar-seg.mat{background:var(--accent)}
+.bar-seg.pay{background:var(--green)}
+.bar-lbl{font-size:9.5px;color:var(--color-muted);white-space:nowrap}
+.legend .key{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--color-muted)}
+.legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.view-title{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:12px;display:flex;align-items:baseline;gap:10px}
+.neg{color:var(--red)}
+
+.actions-cell{white-space:nowrap;text-align:right}
+
+.pass-photo .ph-hint{color:var(--color-muted)}
+.bank-row + .bank-row{margin-top:8px}
+
+/* ===== ПРАВОКА (адаптация под дизайн): чипы статуса — тем же приёмом, что «статусы» дизайна (точка + подпись) ===== */
+.st-badge{display:inline-flex;align-items:center;gap:var(--space-2);white-space:nowrap;font-size:var(--fs-sm);color:var(--color-ink)}
+.st-badge .bdot{flex:none;width:6px;height:6px;border-radius:50%;border:1px solid currentColor;background:currentColor}
+.st-badge.gray{color:var(--color-muted)}
+.st-badge.yellow{color:var(--yellow)}
+.st-badge.green{color:var(--green)}
+.st-badge.red{color:var(--red)}
+
+/* ===== ПРАВОКА (адаптация под дизайн): поля форм — стиль .field из 1111.html ===== */
+.field textarea,textarea.field{width:100%;height:var(--control-h);padding:var(--space-2) 0;background:transparent;
+  border:0;border-bottom:1px solid var(--color-line-strong);border-radius:0;color:var(--color-ink);
+  font-family:inherit;font-size:var(--fs-base);line-height:1.4;
+  transition:border-color var(--dur-fast) var(--ease-out)}
+.field input[type="file"]{border:0;padding-left:0}
+
+dialog .body{display:grid;gap:var(--space-3)}
+dialog .foot{display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-2)}

@@ -1,0 +1,54 @@
+  <!-- Вкладка «Данные»: журнал операций (логика из index 4.html, вид — из 1111.html) -->
+  <div id="viewData">
+
+    <section class="cards cards-5 reveal" style="--i:3" aria-label="Показатели">
+      <div class="card"><p class="card-label">Записей</p><p class="card-value" id="sumCount">0</p></div>
+      <div class="card"><p class="card-label">Материал</p><p class="card-value" id="sumMat">0 ₽</p></div>
+      <div class="card"><p class="card-label">Выплачено</p><p class="card-value" id="sumPaid">0 ₽</p></div>
+      <div class="card"><p class="card-label">В ожидании</p><p class="card-value" id="sumWait">0 ₽</p></div>
+      <div class="card"><p class="card-label">Заработок с ЛК</p><p class="card-value" id="sumIncome">0 ₽</p></div>
+    </section>
+
+    <section class="block reveal" style="--i:4">
+      <div class="block-head">
+        <h2 data-label="tableTitle"></h2>
+        <details class="menu" id="menu">
+          <summary class="btn">Действия</summary>
+          <div class="menu-list" id="menuList">
+            <button class="menu-item" type="button" data-action="rec-new">Новая запись</button>
+            <button class="menu-item" type="button" data-action="drop-new">Новый дроп</button>
+            <button class="menu-item" type="button" data-action="banks-manage">Банки</button>
+            <button class="menu-item" type="button" data-action="export-csv">Экспорт в CSV</button>
+            <button class="menu-item" type="button" data-action="print">Печать / PDF</button>
+            <button class="menu-item" type="button" data-action="settings">Настройки</button>
+          </div>
+        </details>
+      </div>
+
+      <div class="toolbar">
+        <input class="field field-search" id="search" type="search" placeholder="Поиск: ФИО, позывной…  ( / )" aria-label="Поиск" autocomplete="off">
+        <label class="select"><select id="period" aria-label="Период">
+          <option value="today">Сегодня</option>
+          <option value="7">7 дней</option>
+          <option value="30">30 дней</option>
+          <option value="all" selected>Всё время</option>
+          <option value="custom">Выбранные даты</option>
+        </select></label>
+        <div class="range" id="range" hidden>
+          <input class="field" type="date" id="from" aria-label="Дата с">
+          <span>до</span>
+          <input class="field" type="date" id="to" aria-label="Дата по">
+        </div>
+        <span class="spacer"></span>
+        <button class="btn" type="button" data-action="rec-new">+ Запись</button>
+        <button class="btn btn-primary" type="button" data-action="drop-new">+ Дроп</button>
+      </div>
+
+      <div class="table-wrap"><table id="table"></table></div>
+      <p class="empty" id="tableEmpty" hidden></p>
+      <div class="table-foot">
+        <span id="tableCount"></span>
+      </div>
+    </section>
+
+  </div><!-- /viewData -->
