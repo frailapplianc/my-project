@@ -1,0 +1,188 @@
+<!-- ===================== АНИМАЦИИ (добавлено, остальной код не тронут) ===================== -->
+<style id="motion-css">
+/* Меняйте скорость тут */
+:root { --m-dur: 320ms; --m-ease: cubic-bezier(0.23, 1, 0.32, 1); }
+@keyframes m-grow  { from { transform: scaleY(0); } }
+@keyframes m-scalex{ from { transform: scaleX(0); } }
+@keyframes m-fade  { from { opacity: 0; } }
+@keyframes m-rise  { from { opacity: 0; transform: translateY(6px); } }
+@keyframes m-drop  { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+
+/* Столбцы графика растут снизу по очереди */
+#chart .bar { transform-box: fill-box; transform-origin: 50% 100%; will-change: transform;
+  animation: m-grow .7s var(--m-ease) backwards; animation-delay: calc(var(--k, 0) * 45ms + 150ms); }
+#chart .axis, #chart .legend { animation: m-fade .5s ease .5s backwards; }
+/* Доли: линия «заливается» слева, строки выезжают по очереди */
+#breakdown li { animation: m-rise .4s var(--m-ease) backwards; animation-delay: calc(var(--k, 0) * 45ms); }
+.share-fill { transform-origin: 0 50%; animation: m-scalex .8s var(--m-ease) backwards; animation-delay: calc(var(--k, 0) * 45ms + 150ms); }
+/* Меню действий */
+.menu[open] .menu-list { transform-origin: top right; animation: m-drop 180ms var(--m-ease); }
+/* Плавное подсвечивание строк и карточек */
+tbody td { transition: background-color 150ms var(--m-ease); }
+.card { transition: transform 200ms var(--m-ease); }
+@media (hover: hover) and (pointer: fine) { .card:hover { transform: translateY(-2px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  #chart .bar, .share-fill { animation-name: m-fade; }
+  #breakdown li { animation-name: m-fade; }
+  .menu[open] .menu-list { animation-name: m-fade; }
+  .card:hover { transform: none; }
+}
+</style>
+<script id="motion-js">
+/* Слой анимаций: наблюдает за DOM и анимирует то, что отрисовал render(). Логику приложения не трогает. */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const EASE = 'cubic-bezier(0.23, 1, 0.32, 1)';
+  const $ = (s) => document.querySelector(s);
+  const idx = (root, sel) => root.querySelectorAll(sel).forEach((el, i) => el.style.setProperty('--k', i));
+
+  /* ---- Таблица: новые строки появляются каскадом, старые плавно переезжают (FLIP) при сортировке/удалении ---- */
+  const table = $('#table');
+  let tops = new Map();
+  const snap = () => { tops = new Map(); table.querySelectorAll('tbody tr[data-row]').forEach((r) => tops.set(r.dataset.row, r.offsetTop)); };
+  new MutationObserver(() => {
+    const rows = [...table.querySelectorAll('tbody tr[data-row]')];
+    if (!table.offsetParent) { snap(); return; }
+    let n = 0, fresh = 0;
+    rows.forEach((r) => {
+      const prev = tops.get(r.dataset.row);
+      if (prev == null) {
+        fresh++;
+        r.animate(reduce.matches ? { opacity: [0, 1] } : { opacity: [0, 1], transform: ['translateY(8px)', 'none'] },
+          { duration: 320, easing: EASE, delay: Math.min(n++, 16) * 28, fill: 'backwards' });
+      } else if (!reduce.matches) {
+        const dy = prev - r.offsetTop;
+        if (dy) r.animate({ transform: [`translateY(${dy}px)`, 'none'] }, { duration: 380, easing: EASE });
+      }
+    });
+    if (fresh === rows.length) table.querySelectorAll('thead th').forEach((th, i) =>
+      th.animate({ opacity: [0, 1] }, { duration: 300, delay: i * 40, fill: 'backwards' }));
+    snap();
+  }).observe(table, { childList: true });
+
+  /* ---- Вкладки: первое появление каскадом, подчёркивание «выезжает» у выбранной ---- */
+  const tabs = $('#tabs');
+  let tabsFirst = true;
+  new MutationObserver(() => {
+    if (tabsFirst) {
+      tabsFirst = false;
+      tabs.querySelectorAll('.tab').forEach((t, i) => t.animate(
+        { opacity: [0, 1], transform: ['translateY(4px)', 'none'] },
+        { duration: 300, easing: EASE, delay: 120 + i * 50, fill: 'backwards' }));
+      return;
+    }
+    const sel = tabs.querySelector('[aria-selected="true"]');
+    if (sel && !reduce.matches) sel.animate({ transform: matchMedia('(min-width: 900px)').matches ? ['scaleY(0)', 'scaleY(1)'] : ['scaleX(0)', 'scaleX(1)'] },
+      { duration: 260, easing: EASE, pseudoElement: '::after' });
+  }).observe(tabs, { childList: true });
+
+  /* ---- Числа в карточках: счёт от старого значения к новому ---- */
+  const NUM = /\d[\d\s\u00a0\u202f]*(?:[.,]\d+)?/;
+  const parse = (t) => { const m = t.match(NUM); if (!m) return null;
+    const dec = (m[0].match(/[.,](\d+)$/) || [0, ''])[1].length;
+    return { m, dec, v: parseFloat(m[0].replace(/[\s\u00a0\u202f]/g, '').replace(',', '.')) }; };
+  const watch = (el) => {
+    let own = el.textContent, from = (parse(own) || {}).v || 0, raf = 0;
+    new MutationObserver(() => {
+      const target = el.textContent;
+      if (target === own) return;
+      cancelAnimationFrame(raf);
+      const p = parse(target);
+      if (!p || reduce.matches) { own = target; from = p ? p.v : 0; return; }
+      const fmt = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: p.dec, maximumFractionDigits: p.dec });
+      const t0 = performance.now(), a = from, b = p.v;
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / 700), e = 1 - Math.pow(1 - k, 4);
+        own = k < 1 ? target.replace(p.m[0], fmt.format(a + (b - a) * e)) : target;
+        el.textContent = own;
+        if (k < 1) raf = requestAnimationFrame(step); else from = b;
+      };
+      raf = requestAnimationFrame(step);
+    }).observe(el, { childList: true, characterData: true, subtree: true });
+  };
+  ['valIncome', 'valExpense', 'valBalance', 'sValIncome', 'sValExpense', 'sValBalance']
+    .forEach((id) => { const el = document.getElementById(id); if (el) watch(el); });
+
+  /* ---- Задержки по очереди для графика и долей ---- */
+  const chart = $('#chart'), br = $('#breakdown');
+  if (chart) new MutationObserver(() => idx(chart, '.bar')).observe(chart, { childList: true });
+  if (br) new MutationObserver(() => idx(br, 'li')).observe(br, { childList: true });
+  if (chart) idx(chart, '.bar'); if (br) idx(br, 'li');
+})();
+</script>
+<style id="theme-layout-css">
+/* ===== Тёмная тема: только переопределение токенов ===== */
+:root[data-theme="dark"]{
+  --color-bg:#0b0b0c; --color-ink:#f2f2f2; --color-ink-soft:#c9c9c9; --color-muted:#9a9a9f;
+  --color-line:#242427; --color-line-strong:#3b3b40; --color-hover:#151517; --color-accent:#8aa0ff;
+  color-scheme:dark;
+}
+html.theming *, html.theming *::before, html.theming *::after{
+  transition-property:background-color,color,border-color,fill,stroke,opacity !important;
+  transition-duration:.45s !important; transition-timing-function:ease !important;
+}
+.topbar{gap:var(--space-2)} .topbar .logo{margin-right:auto}
+.theme-btn{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--color-line-strong);
+  border-radius:50%;color:var(--color-ink);flex:none}
+.theme-btn:active{transform:scale(.94)}
+.theme-btn svg{width:20px;height:20px;overflow:visible}
+.theme-btn .core{transform:scale(.56);transform-origin:12px 12px;transition:transform .5s var(--ease-out)}
+.theme-btn .cut{transform:translate(14px,-14px);transition:transform .5s var(--ease-out)}
+.theme-btn .rays{transform-origin:12px 12px;transition:transform .5s var(--ease-out),opacity .5s}
+:root[data-theme="dark"] .theme-btn .core{transform:scale(1)}
+:root[data-theme="dark"] .theme-btn .cut{transform:none}
+:root[data-theme="dark"] .theme-btn .rays{transform:rotate(-70deg) scale(.4);opacity:0}
+@media (hover:hover) and (pointer:fine){.theme-btn:hover{background:var(--color-hover)}}
+
+/* ===== Левое меню: категории и «Статистика» (от 900 px) ===== */
+@keyframes m-side{from{opacity:0;transform:translateX(-12px)}}
+@media (min-width:900px){
+  body{padding-left:248px}
+  .tabs-bar{position:fixed;inset:0 auto 0 0;width:248px;z-index:3;margin:0;padding:var(--space-5) var(--space-3);
+    flex-direction:column;align-items:stretch;justify-content:flex-start;gap:var(--space-2);
+    border-bottom:0;border-right:1px solid var(--color-line);background:var(--color-bg);overflow-y:auto}
+  .tabs-bar.reveal{animation-name:m-side}
+  .tabs{flex-direction:column;gap:2px;overflow:visible}
+  .tab{padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);text-align:left;white-space:normal}
+  .tab::after{inset:6px auto 6px 0;width:2px;height:auto;border-radius:2px;transform:scaleY(0);transform-origin:50% 50%}
+  .tab[aria-selected="true"]{background:var(--color-hover)}
+  .tab[aria-selected="true"]::after{transform:scaleY(1)}
+  @media (hover:hover) and (pointer:fine){.tab:hover{background:var(--color-hover)}}
+  .tab-stats{margin:var(--space-3) 0 0;border-top:1px solid var(--color-line);border-radius:0 0 var(--radius-sm) var(--radius-sm);padding-top:var(--space-3)}
+  .tab-stats::after{top:calc(var(--space-3) + 6px)}
+  .tab-add{padding:var(--space-2) var(--space-3);text-align:left}
+  .intro{margin-top:var(--space-2)}
+}
+</style>
+<script id="theme-js">
+(() => {
+  const root = document.documentElement;
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'theme-btn'; b.id = 'themeToggle'; b.setAttribute('aria-label', 'Переключить тему');
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><mask id="thm"><rect x="-8" y="-8" width="40" height="40" fill="#fff"/><circle class="cut" cx="15" cy="9" r="7" fill="#000"/></mask><circle class="core" cx="12" cy="12" r="9" fill="currentColor" stroke="none" mask="url(#thm)"/><g class="rays"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g></svg>';
+  document.querySelector('.topbar').appendChild(b);
+  const set = (t, save) => {
+    root.dataset.theme = t;
+    b.setAttribute('aria-pressed', String(t === 'dark'));
+    const m = (n, v) => { const e = document.querySelector('meta[name="' + n + '"]'); if (e) e.content = v; };
+    m('color-scheme', t); m('theme-color', t === 'dark' ? '#0b0b0c' : '#ffffff');
+    if (save) try { localStorage.setItem('theme', t); } catch (e) {}
+  };
+  set(root.dataset.theme);
+  b.onclick = () => {
+    root.classList.add('theming'); setTimeout(() => root.classList.remove('theming'), 500);
+    set(root.dataset.theme === 'dark' ? 'light' : 'dark', true);
+  };
+  /* Меню слева: стрелки вверх/вниз работают как вправо/влево */
+  const tabs = document.getElementById('tabs');
+  tabs.addEventListener('keydown', (e) => {
+    const k = { ArrowDown: 'ArrowRight', ArrowUp: 'ArrowLeft' }[e.key];
+    if (!k) return;
+    e.preventDefault(); e.stopPropagation();
+    e.target.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+  }, true);
+})();
+</script>
+</body>
+</html>
